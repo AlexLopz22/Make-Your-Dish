@@ -5,7 +5,7 @@ function Header() {
     return (
         <>
             <div className='w-full h-28 flex justify-between items-center py-3.5 text-2xl px-7 '>
-                <img className='h-full' src="./logo.png" alt="Logo MYD" />
+                <img className='h-full' src="/logos/logo.webp" alt="Logo MYD" />
                 <div className='text-center w-1/2 flex justify-between'>
                     <Link className='link' to="/">Inicio</Link>
                     <Link className='link' to="/recetas">Recetas</Link>
@@ -13,11 +13,11 @@ function Header() {
                     <Link className='link'>Foro</Link>
                 </div>
                 <div>
-                    <button className='bg-[var(--color-principal)] text-[var(--color-blanco)] px-3 py-1 boton-acceder'>Acceder</button>
+                    <Link className='bg-[var(--color-principal)] text-[var(--color-blanco)] px-3 py-1 boton-acceder' to={'/login'}>Acceder</Link>
                 </div>
                 <div style={{ display: "none" }}>
                     <Link className='flex items-center '>
-                        <img src="./usuario-icono.png" alt="Usuario icono" className='mr-2' />
+                        <img src="/header/usuario-icono.webp" alt="Usuario icono" className='mr-2' />
                         <div>Usuario</div>
                     </Link>
                 </div>
