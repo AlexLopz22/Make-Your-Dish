@@ -1,8 +1,34 @@
 import '../App.css'
+import React, { useEffect, useState } from 'react';
 import Header from '../components/Header'
 import Footer from '../components/Footer'
 
 function Recetas() {
+    const [recetas, setRecetas] = useState([]);
+    const [ingredientes, setIngredientes] = useState([]);
+
+    const cargarRecetas = () => {
+        fetch('http://localhost:8080/api/recetas')
+            .then(response => response.json())
+            .then(data => {
+                setRecetas(data);
+            })
+            .catch(error => console.error('Error al cargar las recetas:', error));
+    };
+
+    const cargarIngredientes = () => {
+        fetch('http://localhost:8080/api/ingredientes')
+            .then(response => response.json())
+            .then(data => {
+                setIngredientes(data);
+            })
+            .catch(error => console.error('Error al cargar los ingredientes:', error));
+    };
+
+    useEffect(() => {
+        cargarIngredientes();
+        cargarRecetas();
+    }, []);
     return (
         <>
             <Header />
@@ -33,9 +59,12 @@ function Recetas() {
                                 <ul className='p-4'>
                                     <li>
                                         <select name="ingrediente-principal" id="ingrediente-principal">
-                                            <option value="berenjena">Berenjena</option>
-                                            <option value="patata">Patata</option>
-                                            <option value="manzana">Manzana</option>
+                                            <option value="-">-</option>
+                                            {ingredientes.map((ingrediente) => (
+                                                <option key={ingrediente.id} value={ingrediente.id}>
+                                                    {ingrediente.name}
+                                                </option>
+                                            ))}
                                         </select>
                                     </li>
                                 </ul>
@@ -43,78 +72,29 @@ function Recetas() {
                         </div>
                         <div className='w-3/4 pl-5'>
                             <div className='grid grid-cols-3 gap-2.5'>
-                                <div className='border-2 flex flex-col'>
-                                    <img src="/imagenes/comida-1.webp" alt="A" />
-                                    <div className='text-center texto-normal font-medium mb-2'>Salmón a la plancha con rúcula</div>
-                                    <div className='w-2/3 self-center justify-between flex'>
-                                        <div className='flex flex-col items-center mb-2 w-1/2'>
-                                            <img className='w-15' src="/iconos/reloj.webp" alt="Reloj Icono" />
-                                            <div>
-                                                &lt;10 minutos
-                                            </div>
+                                {recetas.map((receta) => (
+                                    <div key={receta.id} className='border-2 flex flex-col'>
+                                        <img src={receta.imageUrl} alt={receta.title} />
+                                        <div className='text-center texto-normal font-medium mb-2' id={`receta_${receta.id}`}>
+                                            {receta.title}
                                         </div>
-                                        <div className='flex flex-col items-center w-1/2'>
-                                            <img className='w-15' src="/iconos/dificultad-icono.png" alt="Reloj Icono" />
-                                            <div>
-                                                Fácil
+                                        <div className='w-2/3 self-center justify-between flex'>
+                                            <div className='flex flex-col items-center mb-2 w-1/2'>
+                                                <img className='w-15' src="/iconos/reloj.webp" alt="Reloj Icono" />
+                                                <div>
+                                                    {receta.prepTime}
+                                                </div>
                                             </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div className='border-2 flex flex-col'>
-                                    <img src="/imagenes/comida-1.webp" alt="A" />
-                                    <div className='text-center texto-normal font-medium mb-2'>Salmón a la plancha con rúcula</div>
-                                    <div className='w-2/3 self-center justify-between flex'>
-                                        <div className='flex flex-col items-center mb-2 w-1/2'>
-                                            <img className='w-15' src="/iconos/reloj.webp" alt="Reloj Icono" />
-                                            <div>
-                                                &lt;10 minutos
-                                            </div>
-                                        </div>
-                                        <div className='flex flex-col items-center w-1/2'>
-                                            <img className='w-15' src="/iconos/dificultad-icono.png" alt="Reloj Icono" />
-                                            <div>
-                                                Fácil
+                                            <div className='flex flex-col items-center w-1/2'>
+                                                <img className='w-15' src="/iconos/dificultad-icono.png" alt="Reloj Icono" />
+                                                <div>
+                                                    Fácil
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
-                                </div>
-                                <div className='border-2 flex flex-col'>
-                                    <img src="/imagenes/comida-1.webp" alt="A" />
-                                    <div className='text-center texto-normal font-medium mb-2'>Salmón a la plancha con rúcula</div>
-                                    <div className='w-2/3 self-center justify-between flex'>
-                                        <div className='flex flex-col items-center mb-2 w-1/2'>
-                                            <img className='w-15' src="/iconos/reloj.webp" alt="Reloj Icono" />
-                                            <div>
-                                                &lt;10 minutos
-                                            </div>
-                                        </div>
-                                        <div className='flex flex-col items-center w-1/2'>
-                                            <img className='w-15' src="/iconos/dificultad-icono.png" alt="Reloj Icono" />
-                                            <div>
-                                                Fácil
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div className='border-2 flex flex-col'>
-                                    <img src="/imagenes/comida-1.webp" alt="A" />
-                                    <div className='text-center texto-normal font-medium mb-2'>Salmón a la plancha con rúcula</div>
-                                    <div className='w-2/3 self-center justify-between flex'>
-                                        <div className='flex flex-col items-center mb-2 w-1/2'>
-                                            <img className='w-15' src="/iconos/reloj.webp" alt="Reloj Icono" />
-                                            <div>
-                                                &lt;10 minutos
-                                            </div>
-                                        </div>
-                                        <div className='flex flex-col items-center w-1/2'>
-                                            <img className='w-15' src="/iconos/dificultad-icono.png" alt="Reloj Icono" />
-                                            <div>
-                                                Fácil
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
+                                ))}
+
                             </div>
                         </div>
                     </div>
