@@ -2,8 +2,15 @@ package make.your.dish.Api.services;
 
 import make.your.dish.Api.entidades.Receta;
 import make.your.dish.Api.repositorio.RecetaRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+
 import java.util.List;
 
 @Service
@@ -19,4 +26,5 @@ public class RecetaService {
     public List<Receta> getAllRecipes() {
         return recetaRepository.findAll();
     }
+
 }
