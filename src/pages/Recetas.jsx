@@ -2,12 +2,14 @@ import '../App.css'
 import React, { useEffect, useState } from 'react';
 import Header from '../components/Header'
 import Footer from '../components/Footer'
+import { motion, AnimatePresence } from 'framer-motion';
+
 
 function Recetas() {
     const [recetas, setRecetas] = useState([]);  // Recetas sin filtrar
     const [recetasFiltradas, setRecetasFiltradas] = useState([]);  // Recetas filtradas
     const [ingredientes, setIngredientes] = useState([]);  // Ingredientes disponibles
-    const [pagina, setPagina] = useState(0);  // Página actual
+    const [pagina, setPagina] = useState(1);  // Página actual
     const [limite, setLimite] = useState(6);  // Recetas por página
     const [totalRecetas, setTotalRecetas] = useState(0);  // Total de recetas
     const [filtros, setFiltros] = useState({
@@ -20,8 +22,7 @@ function Recetas() {
         fetch("http://localhost:8080/api/recetas")
             .then(response => response.json())
             .then(data => {
-                setRecetas(data);  
-                aplicarFiltros(filtros);
+                setRecetas(data);
             })
             .catch(error => console.error('Error al cargar las recetas:', error));
     };
@@ -30,7 +31,7 @@ function Recetas() {
         fetch('http://localhost:8080/api/ingredientes')
             .then(response => response.json())
             .then(data => {
-                setIngredientes(data);  
+                setIngredientes(data);
             })
             .catch(error => console.error('Error al cargar los ingredientes:', error));
     };
@@ -68,8 +69,7 @@ function Recetas() {
             nuevosFiltros.ingrediente = value;
         }
         setFiltros(nuevosFiltros);
-        setPagina(0);  
-        aplicarFiltros(nuevosFiltros);  
+        setPagina(1);
     };
 
     const aplicarFiltros = (filtrosActivos) => {
@@ -118,19 +118,22 @@ function Recetas() {
         }
 
         setRecetasFiltradas(filtradas);
-        setTotalRecetas(Math.max(1, Math.ceil(filtradas.length / limite)));  
+        setTotalRecetas(Math.max(1, Math.ceil(filtradas.length / limite)));
     };
 
     useEffect(() => {
         cargarIngredientes();
         cargarRecetas();
-    }, []);  
+    }, []);
 
-    // Función para cambiar de página
-    const cambiarPagina = (nuevaPagina) => {
-        setPagina(nuevaPagina);
-    };
+    useEffect(() => {
+        aplicarFiltros(filtros);
+    }, [recetas, filtros]);
 
+
+    console.log(((pagina - 1) * limite) + "dad" + (pagina * limite))
+    console.log(recetas)
+    console.log(recetasFiltradas)
     return (
         <>
             <Header />
@@ -138,6 +141,7 @@ function Recetas() {
                 <div className='w-4/5 mx-auto p-3'>
                     <div className='text-3xl mb-5'>Recetas</div>
                     <div className='flex'>
+                        {/* Filtros */}
                         <div className='bg-[var(--color-principal)] text-[var(--color-blanco)] p-5 w-1/4'>
                             <form action="#">
                                 <div className='texto-normal'>Dificultad</div>
@@ -170,33 +174,60 @@ function Recetas() {
                                 </ul>
                             </form>
                         </div>
+
+                        {/* Recetas */}
                         <div className='w-3/4 pl-5'>
-                            <div className='grid grid-cols-3 gap-2.5'>
-                                {(recetasFiltradas.length > 0 ? recetasFiltradas : recetas).map((receta) => (
-                                    <div key={receta.id} className='border-2 flex flex-col justify-between'>
-                                        <img className='w-full' src={receta.image_url} alt={receta.title} />
-                                        <div className='text-center texto-normal font-medium mb-2' id={`receta_${receta.id}`}>
-                                            {receta.title}
+                            <AnimatePresence mode="wait">
+                                <motion.div
+                                    key={
+                                        recetasFiltradas.length === 0 || recetas.length === 0
+                                            ? 'no-recetas'
+                                            : `pagina-${pagina}-${recetasFiltradas.length}`
+                                    }
+                                    initial={{ opacity: 0, y: 20 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    exit={{ opacity: 0, y: -20 }}
+                                    transition={{ duration: 0.4 }}
+                                    className='grid grid-cols-3 gap-2.5 h-full'
+                                >
+                                    {(recetasFiltradas.length === 0 || recetas.length === 0) ? (
+                                        <div className='col-span-full text-center flex justify-center items-center h-full bg-[#eaf5d4]'>
+                                            No hay recetas disponibles.
                                         </div>
-                                        <div className='px-3 text-center'>{receta.description}</div>
-                                        <div className='w-2/3 self-center justify-between flex'>
-                                            <div className='flex flex-col items-center mb-2 w-1/2'>
-                                                <img className='w-15' src="/iconos/reloj.webp" alt="Reloj Icono" />
-                                                <div>{receta.totalTimeMinutes} m</div>
+                                    ) : (
+                                        <>
+                                            {(recetasFiltradas.length > 0 ? recetasFiltradas : recetas)
+                                                .slice((pagina - 1) * limite, pagina * limite)
+                                                .map((receta) => (
+                                                    <div key={receta.id} className='border-2 flex flex-col justify-between'>
+                                                        <img className='w-full' src={receta.image_url} alt={receta.title} />
+                                                        <div className='text-center texto-normal font-medium mb-2' id={`receta_${receta.id}`}>
+                                                            {receta.title}
+                                                        </div>
+                                                        <div className='px-3 text-center'>{receta.description}</div>
+                                                        <div className='w-2/3 self-center justify-between flex'>
+                                                            <div className='flex flex-col items-center mb-2 w-1/2'>
+                                                                <img className='w-15' src="/iconos/reloj.webp" alt="Reloj Icono" />
+                                                                <div>{receta.totalTimeMinutes} m</div>
+                                                            </div>
+                                                            <div className='flex flex-col items-center w-1/2'>
+                                                                <img className='w-15' src="/iconos/dificultad-icono.png" alt="Dificultad Icono" />
+                                                                <div>{dificultad_receta(receta.totalTimeMinutes)}</div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                ))
+                                            }
+
+                                            <div className='text-right w-full col-span-full px-2 texto-normal'>
+                                                <button disabled={pagina === 0} onClick={() => setPagina(pagina - 1)}>&lt;</button>
+                                                {pagina} de {totalRecetas}
+                                                <button disabled={pagina === totalRecetas} onClick={() => setPagina(pagina + 1)}>&gt;</button>
                                             </div>
-                                            <div className='flex flex-col items-center w-1/2'>
-                                                <img className='w-15' src="/iconos/dificultad-icono.png" alt="Reloj Icono" />
-                                                <div>{dificultad_receta(receta.totalTimeMinutes)}</div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                ))}
-                                <div className='text-right w-full col-span-full px-2 texto-normal'>
-                                    <button disabled={pagina === 0} onClick={() => cambiarPagina(pagina - 1)}>&lt;</button>
-                                    {pagina + 1} de {totalRecetas}
-                                    <button disabled={pagina === totalRecetas - 1} onClick={() => cambiarPagina(pagina + 1)}>&gt;</button>
-                                </div>
-                            </div>
+                                        </>
+                                    )}
+                                </motion.div>
+                            </AnimatePresence>
                         </div>
                     </div>
                 </div>
