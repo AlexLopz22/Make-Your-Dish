@@ -49,7 +49,7 @@ function Recetas() {
     const handleFiltroChange = (event) => {
         const { name, value, checked, type } = event.target;
         const nuevosFiltros = { ...filtros };
-
+    
         if (type === "checkbox") {
             if (name.startsWith("menos") || name.startsWith("entre") || name.startsWith("mas")) {
                 if (checked) {
@@ -67,14 +67,40 @@ function Recetas() {
             }
         } else if (type === "select-one") {
             nuevosFiltros.ingrediente = value;
+            fetchRecetasPorIngrediente(value);
         }
+    
         setFiltros(nuevosFiltros);
-        setPagina(1);
+        setPagina(1);  // Siempre empezar desde la página 1 al cambiar un filtro
     };
-
+    
+    // Ahora aseguramos que los filtros se apliquen correctamente con la nueva lógica de ingrediente
+    const fetchRecetasPorIngrediente = async (ingrediente) => {
+        try {
+            let filtradas = [];
+            if (ingrediente === '-') {
+                // Si no hay ingrediente, recargamos todas las recetas
+                filtradas = recetas;
+            } else {
+                const response = await fetch(`http://localhost:8080/api/recetas/ingrediente/${ingrediente}`);
+                filtradas = await response.json();
+            }
+    
+            // Aplica filtros de tiempo y dificultad
+            aplicarFiltros({ ...filtros, ingrediente });
+    
+            setRecetasFiltradas(filtradas);
+            setTotalRecetas(Math.max(1, Math.ceil(filtradas.length / limite)));
+        } catch (error) {
+            console.error("Error al obtener las recetas:", error);
+        }
+    };
+    
+    // Se debe aplicar el filtro cada vez que cambien los filtros o recetas
     const aplicarFiltros = (filtrosActivos) => {
         let filtradas = recetas;
-
+    
+        // Filtrar por tiempo
         if (filtrosActivos.tiempo.length > 0) {
             filtradas = filtradas.filter(receta => {
                 return filtrosActivos.tiempo.some(filtro => {
@@ -93,7 +119,8 @@ function Recetas() {
                 });
             });
         }
-
+    
+        // Filtrar por dificultad
         if (filtrosActivos.dificultad.length > 0) {
             filtradas = filtradas.filter(receta =>
                 filtrosActivos.dificultad.some(filtro => {
@@ -110,17 +137,31 @@ function Recetas() {
                 })
             );
         }
-
+    
+        // Filtrar por ingrediente
         if (filtrosActivos.ingrediente && filtrosActivos.ingrediente !== "-") {
             filtradas = filtradas.filter(receta =>
                 receta.ingredientePrincipal === filtrosActivos.ingrediente
             );
         }
-
+    
         setRecetasFiltradas(filtradas);
         setTotalRecetas(Math.max(1, Math.ceil(filtradas.length / limite)));
+    };    
+
+    const handlePreviousPage = () => {
+        if (pagina > 1) {
+            setPagina(pagina - 1);
+        }
+    };
+    
+    const handleNextPage = () => {
+        if (pagina < totalRecetas) {
+            setPagina(pagina + 1);
+        }
     };
 
+    
     useEffect(() => {
         cargarIngredientes();
         cargarRecetas();
@@ -129,11 +170,6 @@ function Recetas() {
     useEffect(() => {
         aplicarFiltros(filtros);
     }, [recetas, filtros]);
-
-
-    console.log(((pagina - 1) * limite) + "dad" + (pagina * limite))
-    console.log(recetas)
-    console.log(recetasFiltradas)
     return (
         <>
             <Header />
@@ -220,9 +256,9 @@ function Recetas() {
                                             }
 
                                             <div className='text-right w-full col-span-full px-2 texto-normal'>
-                                                <button disabled={pagina === 0} onClick={() => setPagina(pagina - 1)}>&lt;</button>
+                                                <button disabled={pagina === 1} onClick={handlePreviousPage}>&lt;</button>
                                                 {pagina} de {totalRecetas}
-                                                <button disabled={pagina === totalRecetas} onClick={() => setPagina(pagina + 1)}>&gt;</button>
+                                                <button disabled={pagina === totalRecetas} onClick={handleNextPage}>&gt;</button>
                                             </div>
                                         </>
                                     )}

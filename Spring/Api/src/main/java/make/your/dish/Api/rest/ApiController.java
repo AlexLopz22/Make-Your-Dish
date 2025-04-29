@@ -13,6 +13,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.web.bind.annotation.*;
 import make.your.dish.Api.repositorio.RecetaRepository;
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/api")
@@ -32,7 +33,12 @@ public class ApiController {
     }
 
     @GetMapping("/ingredientes")
-    public List<Ingrediente> getAllIngredientes(){
-        return ingredienteService.getAllIngredientes();
+    public List<Ingrediente> getAllIngredientesPrincipales(){
+        return ingredienteService.getAllIngredientesPrincipales();
+    }
+
+    @GetMapping("/recetas/ingrediente/{ingredienteId}")
+    public List<Receta> obtenerRecetasPorIngrediente(@PathVariable Integer ingredienteId) {
+        return recetaService.obtenerRecetasPorIngrediente(ingredienteId);
     }
 }

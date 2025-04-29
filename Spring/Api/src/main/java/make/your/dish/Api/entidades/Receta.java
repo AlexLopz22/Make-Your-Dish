@@ -2,6 +2,8 @@ package make.your.dish.Api.entidades;
 
 import jakarta.persistence.*;
 
+import java.util.List;
+
 @Entity
 @Table(name = "recipes", schema = "myd_app")
 public class Receta {
@@ -31,6 +33,9 @@ public class Receta {
 
     @Column(name = "description")
     private String description;
+
+    @OneToMany(mappedBy = "receta", cascade = CascadeType.ALL)
+    private List<IngredientesReceta> ingredientes;
 
     // Getters y setters
     public Integer getId() {

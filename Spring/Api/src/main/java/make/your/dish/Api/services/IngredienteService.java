@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class IngredienteService {
@@ -16,6 +17,9 @@ public class IngredienteService {
     @Autowired
     public IngredienteService(IngredienteRepository ingredienteRepository) {
         this.ingredienteRepository = ingredienteRepository;
+    }
+    public List<Ingrediente> getAllIngredientesPrincipales() {
+        return ingredienteRepository.findByPrincipal("Si");
     }
 
     public List<Ingrediente> getAllIngredientes() {

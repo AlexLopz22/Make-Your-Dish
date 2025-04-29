@@ -2,6 +2,8 @@ package make.your.dish.Api.entidades;
 
 import jakarta.persistence.*;
 
+import java.util.List;
+
 @Entity
 @Table(name = "ingredients", schema = "myd_app")
 public class Ingrediente {
@@ -12,6 +14,21 @@ public class Ingrediente {
 
     @Column(name = "name", nullable = false)
     private String name;
+
+    @Column(name = "principal", nullable = false)
+    private String principal;
+
+    @OneToMany(mappedBy = "ingrediente")
+    private List<IngredientesReceta> recetas;
+
+
+    public String getPrincipal() {
+        return principal;
+    }
+
+    public void setPrincipal(String principal) {
+        this.principal = principal;
+    }
 
     public Integer getId() {
         return id;

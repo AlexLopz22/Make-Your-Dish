@@ -27,4 +27,8 @@ public class RecetaService {
         return recetaRepository.findAll();
     }
 
+    public List<Receta> obtenerRecetasPorIngrediente(Integer ingredienteId) {
+        return recetaRepository.findRecetasByIngrediente(ingredienteId);
+    }
+
 }
