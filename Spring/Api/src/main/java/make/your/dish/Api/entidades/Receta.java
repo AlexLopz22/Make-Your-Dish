@@ -31,6 +31,15 @@ public class Receta {
     @Column(name = "servings")
     private Integer servings;
 
+    @Column(name = "category")
+    private String category;
+
+    @Column(name = "cuisine")
+    private String cuisine;
+
+    @Column(name = "calories_per_serving")
+    private Integer caloriesPerServing;
+
     @Column(name = "description")
     private String description;
 
@@ -100,5 +109,29 @@ public class Receta {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public String getCategory() {
+        return category;
+    }
+
+    public void setCategory(String category) {
+        this.category = category;
+    }
+
+    public Integer getCaloriesPerServing() {
+        return caloriesPerServing;
+    }
+
+    public void setCaloriesPerServing(Integer caloriesPerServing) {
+        this.caloriesPerServing = caloriesPerServing;
+    }
+
+    public String getCuisine() {
+        return cuisine;
+    }
+
+    public void setCuisine(String cuisine) {
+        this.cuisine = cuisine;
     }
 }

@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class RecetaService {
@@ -29,6 +30,10 @@ public class RecetaService {
 
     public List<Receta> obtenerRecetasPorIngrediente(Integer ingredienteId) {
         return recetaRepository.findRecetasByIngrediente(ingredienteId);
+    }
+
+    public Optional<Receta> obtenerRecetaPorId(Integer id) {
+        return recetaRepository.findById(Long.valueOf(id));
     }
 
 }

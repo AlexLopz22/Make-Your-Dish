@@ -1,5 +1,6 @@
 package make.your.dish.Api.services;
 
+import make.your.dish.Api.dto.IngredienteCantidadDTO;
 import make.your.dish.Api.entidades.Ingrediente;
 import make.your.dish.Api.entidades.Receta;
 import make.your.dish.Api.repositorio.IngredienteRepository;
@@ -24,5 +25,9 @@ public class IngredienteService {
 
     public List<Ingrediente> getAllIngredientes() {
         return ingredienteRepository.findAll();
+    }
+
+    public List<IngredienteCantidadDTO> getIngredientesByReceta(Integer recetaId) {
+        return ingredienteRepository.findIngredienteNamesByRecetaId(Long.valueOf(recetaId));
     }
 }

@@ -12,7 +12,6 @@ import java.util.List;
 
 @Repository
 public interface RecetaRepository extends JpaRepository<Receta, Long> {
-    Page<Receta> findAll(Pageable pageable);
 
     @Query("SELECT ri.receta FROM IngredientesReceta ri WHERE ri.ingrediente.id = :ingredienteId")
     List<Receta> findRecetasByIngrediente(@Param("ingredienteId") Integer ingredienteId);

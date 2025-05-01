@@ -1,6 +1,7 @@
 package make.your.dish.Api.rest;
 
 
+import make.your.dish.Api.dto.IngredienteCantidadDTO;
 import make.your.dish.Api.entidades.Ingrediente;
 import make.your.dish.Api.entidades.Receta;
 import make.your.dish.Api.services.IngredienteService;
@@ -40,5 +41,15 @@ public class ApiController {
     @GetMapping("/recetas/ingrediente/{ingredienteId}")
     public List<Receta> obtenerRecetasPorIngrediente(@PathVariable Integer ingredienteId) {
         return recetaService.obtenerRecetasPorIngrediente(ingredienteId);
+    }
+
+    @GetMapping("/receta/{id}")
+    public Optional<Receta> obtenerRecetaPorId(@PathVariable Integer id) {
+        return recetaService.obtenerRecetaPorId(id);
+    }
+
+    @GetMapping("/receta/ingredientes/{idreceta}")
+    public List<IngredienteCantidadDTO> obtenerIngredientesPorReceta(@PathVariable Integer idreceta) {
+        return ingredienteService.getIngredientesByReceta(idreceta);
     }
 }
