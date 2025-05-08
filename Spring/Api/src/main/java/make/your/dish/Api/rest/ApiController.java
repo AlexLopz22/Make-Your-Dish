@@ -3,8 +3,10 @@ package make.your.dish.Api.rest;
 
 import make.your.dish.Api.dto.IngredienteCantidadDTO;
 import make.your.dish.Api.entidades.Ingrediente;
+import make.your.dish.Api.entidades.PasosReceta;
 import make.your.dish.Api.entidades.Receta;
 import make.your.dish.Api.services.IngredienteService;
+import make.your.dish.Api.services.PasoRecetaService;
 import make.your.dish.Api.services.RecetaService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -21,11 +23,13 @@ import java.util.Optional;
 public class ApiController {
     private final RecetaService recetaService;
     private final IngredienteService ingredienteService;
+    private PasoRecetaService pasoRecetaService;
 
     @Autowired
-    public ApiController(RecetaService recetaService, IngredienteService ingredienteService) {
+    public ApiController(RecetaService recetaService, IngredienteService ingredienteService, PasoRecetaService pasoRecetaService) {
         this.recetaService = recetaService;
         this.ingredienteService = ingredienteService;
+        this.pasoRecetaService = pasoRecetaService;
     }
 
     @GetMapping("/recetas")
@@ -51,5 +55,10 @@ public class ApiController {
     @GetMapping("/receta/ingredientes/{idreceta}")
     public List<IngredienteCantidadDTO> obtenerIngredientesPorReceta(@PathVariable Integer idreceta) {
         return ingredienteService.getIngredientesByReceta(idreceta);
+    }
+
+    @GetMapping("receta/pasos/{idreceta}")
+    public List<PasosReceta> obtenerPasosPorReceta(@PathVariable Integer idreceta) {
+        return pasoRecetaService.getAllPasos(idreceta);
     }
 }
