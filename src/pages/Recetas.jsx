@@ -4,172 +4,192 @@ import Header from '../components/Header'
 import Footer from '../components/Footer'
 import { motion, AnimatePresence } from 'framer-motion';
 import { Link } from 'react-router-dom';
-
+import ListaRecetas from '../components/ListaRecetas';
 
 function Recetas() {
-    const [recetas, setRecetas] = useState([]);  // Recetas sin filtrar
-    const [recetasFiltradas, setRecetasFiltradas] = useState([]);  // Recetas filtradas
-    const [ingredientes, setIngredientes] = useState([]);  // Ingredientes disponibles
-    const [pagina, setPagina] = useState(1);  // Página actual
-    const [limite, setLimite] = useState(6);  // Recetas por página
-    const [totalRecetas, setTotalRecetas] = useState(0);  // Total de recetas
+    const [recetas, setRecetas] = useState([]);  // Todas las recetas
+    const [recetasFiltradas, setRecetasFiltradas] = useState([]);  // Resultado de filtros
+    const [ingredientes, setIngredientes] = useState([]);
+    const [pagina, setPagina] = useState(1);
+    const [limite, setLimite] = useState(6);
+    const [totalPaginas, setTotalPaginas] = useState(1);
     const [filtros, setFiltros] = useState({
         dificultad: [],
         tiempo: [],
-        ingrediente: "",
+        ingrediente: "-",
     });
+    const [tipoFiltro, setTipoFiltro] = useState('');  // Tipo de filtro seleccionado
 
-    const cargarRecetas = () => {
+    // Cargar todas las recetas iniciales
+    useEffect(() => {
         fetch("http://localhost:8080/api/recetas")
-            .then(response => response.json())
+            .then(res => res.json())
             .then(data => {
                 setRecetas(data);
             })
-            .catch(error => console.error('Error al cargar las recetas:', error));
-    };
+            .catch(err => console.error("Error al cargar recetas:", err));
+    }, []);
 
-    const cargarIngredientes = () => {
-        fetch('http://localhost:8080/api/ingredientes')
-            .then(response => response.json())
-            .then(data => {
-                setIngredientes(data);
-            })
-            .catch(error => console.error('Error al cargar los ingredientes:', error));
-    };
+    // Cargar ingredientes
+    useEffect(() => {
+        fetch("http://localhost:8080/api/ingredientes")
+            .then(res => res.json())
+            .then(data => setIngredientes(data))
+            .catch(err => console.error("Error al cargar ingredientes:", err));
+    }, []);
 
-    const dificultad_receta = (minutos) => {
-        if (minutos < 20) {
-            return "Fácil"
-        } else if (minutos >= 20 && minutos < 40) {
-            return "Media"
-        } else {
-            return "Difícil"
-        }
-    }
+    // Aplicar filtros cuando cambian `recetas` o `filtros`
+    useEffect(() => {
+        const aplicarFiltros = () => {
+            let filtradas = [...recetas];
 
-    const handleFiltroChange = (event) => {
-        const { name, value, checked, type } = event.target;
+            // Filtrar por ingrediente
+            if (filtros.ingrediente && filtros.ingrediente !== "-") {
+                fetch(`http://localhost:8080/api/recetas/ingrediente/${filtros.ingrediente}`)
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Error al obtener las recetas');
+                        }
+                        return response.json(); 
+                    })
+                    .then(data => {
+                        filtradas = data; 
+                        setRecetasFiltradas(filtradas); 
+                    })
+                    .catch(error => {
+                        console.error('Hubo un problema con la solicitud fetch:', error);
+                    });
+            }
+
+            // Filtrar por tiempo
+            if (filtros.tiempo.length > 0) {
+                filtradas = filtradas.filter(receta =>
+                    filtros.tiempo.some(filtro => {
+                        const minutos = receta.totalTimeMinutes;
+                        switch (filtro) {
+                            case "menos-20":
+                                return minutos < 20;
+                            case "entre-20-30":
+                                return minutos >= 20 && minutos <= 30;
+                            case "entre-30-40":
+                                return minutos > 30 && minutos <= 40;
+                            case "mas-40":
+                                return minutos > 40;
+                            default:
+                                return true;
+                        }
+                    })
+                );
+            }
+
+            // Filtrar por dificultad
+            if (filtros.dificultad.length > 0) {
+                filtradas = filtradas.filter(receta => {
+                    const dificultad = dificultad_receta(receta.totalTimeMinutes);
+                    return filtros.dificultad.some(filtro => {
+                        switch (filtro) {
+                            case "dificultad-facil":
+                                return dificultad === "Fácil";
+                            case "dificultad-media":
+                                return dificultad === "Media";
+                            case "dificultad-dificil":
+                                return dificultad === "Difícil";
+                            default:
+                                return true;
+                        }
+                    });
+                });
+            }
+
+            // Actualizar el estado de recetas filtradas
+            setRecetasFiltradas(filtradas);
+            setTotalPaginas(Math.max(1, Math.ceil(filtradas.length / limite)));
+        };
+
+        aplicarFiltros();
+    }, [recetas, filtros, limite]);
+
+    // Cambiar filtros desde UI
+    const handleFiltroChange = (e) => {
+        const { name, value, checked, type } = e.target;
         const nuevosFiltros = { ...filtros };
 
         if (type === "checkbox") {
-            if (name.startsWith("menos") || name.startsWith("entre") || name.startsWith("mas")) {
-                if (checked) {
-                    nuevosFiltros.tiempo.push(name);
-                } else {
-                    nuevosFiltros.tiempo = nuevosFiltros.tiempo.filter(f => f !== name);
-                }
-            }
+            // Filtrar por dificultad
             if (name.startsWith("dificultad")) {
-                if (checked) {
-                    nuevosFiltros.dificultad.push(name);
-                } else {
-                    nuevosFiltros.dificultad = nuevosFiltros.dificultad.filter(f => f !== name);
-                }
+                nuevosFiltros.dificultad = checked
+                    ? [...nuevosFiltros.dificultad, name]
+                    : nuevosFiltros.dificultad.filter(f => f !== name);
             }
-        } else if (type === "select-one") {
+            // Filtrar por tiempo
+            else if (name.startsWith("menos") || name.startsWith("entre") || name.startsWith("mas")) {
+                nuevosFiltros.tiempo = checked
+                    ? [...nuevosFiltros.tiempo, name]
+                    : nuevosFiltros.tiempo.filter(f => f !== name);
+            }
+        }
+        // Filtrar por ingrediente
+        else if (type === "select-one") {
             nuevosFiltros.ingrediente = value;
-            fetchRecetasPorIngrediente(value);
+            console.log(value)
         }
 
         setFiltros(nuevosFiltros);
-        setPagina(1);  // Siempre empezar desde la página 1 al cambiar un filtro
     };
 
-    // Ahora aseguramos que los filtros se apliquen correctamente con la nueva lógica de ingrediente
-    const fetchRecetasPorIngrediente = async (ingrediente) => {
-        try {
-            let filtradas = [];
-            if (ingrediente === '-') {
-                // Si no hay ingrediente, recargamos todas las recetas
-                filtradas = recetas;
-            } else {
-                const response = await fetch(`http://localhost:8080/api/recetas/ingrediente/${ingrediente}`);
-                filtradas = await response.json();
-            }
 
-            aplicarFiltros({ ...filtros, ingrediente });
+    // Cambiar el tipo de filtro (Dificultad, Tiempo, Ingrediente)
+    const handleTipoFiltroChange = (e) => {
+        const selectedFiltro = e.target.value;
+        setTipoFiltro(selectedFiltro);
 
-            setRecetasFiltradas(filtradas);
-            setTotalRecetas(Math.max(1, Math.ceil(filtradas.length / limite)));
-        } catch (error) {
-            console.error("Error al obtener las recetas:", error);
-        }
-    };
-
-    // Se debe aplicar el filtro cada vez que cambien los filtros o recetas
-    const aplicarFiltros = (filtrosActivos) => {
-        let filtradas = recetas;
-
-        // Filtrar por tiempo
-        if (filtrosActivos.tiempo.length > 0) {
-            filtradas = filtradas.filter(receta => {
-                return filtrosActivos.tiempo.some(filtro => {
-                    switch (filtro) {
-                        case "menos-20":
-                            return receta.totalTimeMinutes < 20;
-                        case "entre-20-30":
-                            return receta.totalTimeMinutes >= 20 && receta.totalTimeMinutes <= 30;
-                        case "entre-30-40":
-                            return receta.totalTimeMinutes > 30 && receta.totalTimeMinutes <= 40;
-                        case "mas-40":
-                            return receta.totalTimeMinutes > 40;
-                        default:
-                            return true;
-                    }
-                });
+        // Limpiar filtros previos cuando el tipo de filtro cambia
+        if (selectedFiltro === "dificultad") {
+            setFiltros({
+                dificultad: [],
+                tiempo: [],
+                ingrediente: "-"
+            });
+        } else if (selectedFiltro === "tiempo") {
+            setFiltros({
+                dificultad: [],
+                tiempo: [],
+                ingrediente: "-"
+            });
+        } else if (selectedFiltro === "ingrediente") {
+            setFiltros({
+                dificultad: [],
+                tiempo: [],
+                ingrediente: "-"
+            });
+        } else {
+            setFiltros({
+                dificultad: [],
+                tiempo: [],
+                ingrediente: "-"
             });
         }
-
-        // Filtrar por dificultad
-        if (filtrosActivos.dificultad.length > 0) {
-            filtradas = filtradas.filter(receta =>
-                filtrosActivos.dificultad.some(filtro => {
-                    switch (filtro) {
-                        case "dificultad-facil":
-                            return dificultad_receta(receta.totalTimeMinutes) === "Fácil";
-                        case "dificultad-media":
-                            return dificultad_receta(receta.totalTimeMinutes) === "Media";
-                        case "dificultad-dificil":
-                            return dificultad_receta(receta.totalTimeMinutes) === "Difícil";
-                        default:
-                            return true;
-                    }
-                })
-            );
-        }
-
-        // Filtrar por ingrediente
-        if (filtrosActivos.ingrediente && filtrosActivos.ingrediente !== "-") {
-            filtradas = filtradas.filter(receta =>
-                receta.ingredientePrincipal === filtrosActivos.ingrediente
-            );
-        }
-
-        setRecetasFiltradas(filtradas);
-        setTotalRecetas(Math.max(1, Math.ceil(filtradas.length / limite)));
     };
 
+    // Dificultad calculada por tiempo
+    const dificultad_receta = (minutos) => {
+        if (minutos < 20) return "Fácil";
+        if (minutos < 40) return "Media";
+        return "Difícil";
+    };
+
+    // Paginación
     const handlePreviousPage = () => {
-        if (pagina > 1) {
-            setPagina(pagina - 1);
-        }
+        if (pagina > 1) setPagina(pagina - 1);
     };
 
     const handleNextPage = () => {
-        if (pagina < totalRecetas) {
-            setPagina(pagina + 1);
-        }
+        if (pagina < totalPaginas) setPagina(pagina + 1);
     };
 
+    // Mostrar las recetas de la página actual
+    const recetasPorPagina = recetasFiltradas.slice((pagina - 1) * limite, pagina * limite);
 
-    useEffect(() => {
-        cargarIngredientes();
-        cargarRecetas();
-    }, []);
-
-    useEffect(() => {
-        aplicarFiltros(filtros);
-    }, [recetas, filtros]);
     return (
         <>
             <Header />
@@ -180,34 +200,101 @@ function Recetas() {
                         {/* Filtros */}
                         <div className='bg-[var(--color-principal)] text-[var(--color-blanco)] p-5 w-1/4'>
                             <form action="#">
-                                <div className='texto-normal'>Dificultad</div>
-                                <ul className='p-4'>
-                                    <li><input type="checkbox" name="dificultad-facil" id="dificultad-facil" onChange={handleFiltroChange} /> Fácil</li>
-                                    <li><input type="checkbox" name="dificultad-media" id="dificultad-media" onChange={handleFiltroChange} /> Media</li>
-                                    <li><input type="checkbox" name="dificultad-dificil" id="dificultad-dificil" onChange={handleFiltroChange} /> Difícil</li>
-                                </ul>
-                                <hr />
-                                <div className='texto-normal'>Tiempo de preparación</div>
-                                <ul className='p-4'>
-                                    <li><input type="checkbox" name="menos-20" id="menos-20" onChange={handleFiltroChange} /> &lt; 20 minutos</li>
-                                    <li><input type="checkbox" name="entre-20-30" id="entre-20-30" onChange={handleFiltroChange} /> 20-30 minutos</li>
-                                    <li><input type="checkbox" name="entre-30-40" id="entre-30-40" onChange={handleFiltroChange} /> 30-40 minutos</li>
-                                    <li><input type="checkbox" name="mas-40" id="mas-40" onChange={handleFiltroChange} /> &gt; 40 minutos</li>
-                                </ul>
-                                <hr />
-                                <div className='texto-normal'>Ingrediente principal</div>
-                                <ul className='p-4'>
-                                    <li>
-                                        <select name="ingrediente-principal" id="ingrediente-principal" onChange={handleFiltroChange}>
-                                            <option value="-">-</option>
-                                            {ingredientes.map((ingrediente) => (
-                                                <option key={ingrediente.id} value={ingrediente.id}>
-                                                    {ingrediente.name}
-                                                </option>
-                                            ))}
-                                        </select>
-                                    </li>
-                                </ul>
+                                <div className='texto-normal mb-2'>Filtrar por:</div>
+
+                                {/* Selector para el tipo de filtro */}
+                                <select name="tipo-filtro" onChange={handleTipoFiltroChange} value={tipoFiltro} className='w-full mb-4 bg-[var(--color-principal)]'>
+                                    <option value="">Selecciona una opción</option>
+                                    <option value="dificultad">Dificultad</option>
+                                    <option value="tiempo">Tiempo de preparación</option>
+                                    <option value="ingrediente">Ingrediente principal</option>
+                                </select>
+
+                                <hr className='my-2' />
+
+                                {/* Filtro por dificultad */}
+                                {tipoFiltro === 'dificultad' && (
+                                    <>
+                                        <div className='texto-normal'>Dificultad</div>
+                                        <ul className='p-4 '>
+                                            <li><input type="checkbox" className="appearance-none w-4 h-4 border border-gray-400 bg-white checked:bg-[var(--color-principal)] rounded-sm cursor-pointer" name="dificultad-facil" onChange={handleFiltroChange} /> Fácil</li>
+                                            <li><input type="checkbox" className="appearance-none w-4 h-4 border border-gray-400 bg-white checked:bg-[var(--color-principal)] rounded-sm cursor-pointer" name="dificultad-media" onChange={handleFiltroChange} /> Media</li>
+                                            <li><input type="checkbox" className="appearance-none w-4 h-4 border border-gray-400 bg-white checked:bg-[var(--color-principal)] rounded-sm cursor-pointer" name="dificultad-dificil" onChange={handleFiltroChange} /> Difícil</li>
+                                        </ul>
+                                    </>
+                                )}
+
+                                {/* Filtro por tiempo */}
+                                {tipoFiltro === 'tiempo' && (
+                                    <>
+                                        <div className='texto-normal'>Tiempo de preparación</div>
+                                        <ul className='p-4 space-y-2'>
+                                            <li>
+                                                <label className="flex items-center gap-2">
+                                                    <input
+                                                        type="checkbox"
+                                                        name="menos-20"
+                                                        onChange={handleFiltroChange}
+                                                        className="appearance-none w-4 h-4 border border-gray-400 bg-white checked:bg-[var(--color-principal)] rounded-sm cursor-pointer"
+                                                    />
+                                                    <span>&lt; 20 minutos</span>
+                                                </label>
+                                            </li>
+                                            <li>
+                                                <label className="flex items-center gap-2">
+                                                    <input
+                                                        type="checkbox"
+                                                        name="entre-20-30"
+                                                        onChange={handleFiltroChange}
+                                                        className="appearance-none w-4 h-4 border border-gray-400 bg-white checked:bg-[var(--color-principal)] rounded-sm cursor-pointer"
+                                                    />
+                                                    <span>20-30 minutos</span>
+                                                </label>
+                                            </li>
+                                            <li>
+                                                <label className="flex items-center gap-2">
+                                                    <input
+                                                        type="checkbox"
+                                                        name="entre-30-40"
+                                                        onChange={handleFiltroChange}
+                                                        className="appearance-none w-4 h-4 border border-gray-400 bg-white checked:bg-[var(--color-principal)] rounded-sm cursor-pointer"
+                                                    />
+                                                    <span>30-40 minutos</span>
+                                                </label>
+                                            </li>
+                                            <li>
+                                                <label className="flex items-center gap-2">
+                                                    <input
+                                                        type="checkbox"
+                                                        name="mas-40"
+                                                        onChange={handleFiltroChange}
+                                                        className="appearance-none w-4 h-4 border border-gray-400 bg-white checked:bg-[var(--color-principal)] rounded-sm cursor-pointer"
+                                                    />
+                                                    <span>&gt; 40 minutos</span>
+                                                </label>
+                                            </li>
+                                        </ul>
+                                    </>
+                                )}
+
+                                {/* Filtro por ingrediente */}
+                                {tipoFiltro === 'ingrediente' && (
+                                    <>
+                                        <div className='texto-normal'>Ingrediente principal</div>
+                                        <ul className='p-4'>
+                                            <li>
+                                                <select name="ingrediente-principal" onChange={handleFiltroChange} className='bg-[var(--color-principal)] w-full'>
+                                                    <option value="-">-</option>
+                                                    {ingredientes.map((ingrediente) => (
+                                                        <option key={ingrediente.id} value={ingrediente.id}>
+                                                            {ingrediente.name}
+                                                        </option>
+                                                    ))}
+                                                </select>
+                                            </li>
+                                        </ul>
+                                    </>
+                                )}
                             </form>
                         </div>
 
@@ -215,11 +302,7 @@ function Recetas() {
                         <div className='w-3/4 pl-5'>
                             <AnimatePresence mode="wait">
                                 <motion.div
-                                    key={
-                                        recetasFiltradas.length === 0 || recetas.length === 0
-                                            ? 'no-recetas'
-                                            : `pagina-${pagina}-${recetasFiltradas.length}`
-                                    }
+                                    key={recetasFiltradas.length === 0 || recetas.length === 0 ? 'no-recetas' : `pagina-${pagina}-${recetasFiltradas.length}`}
                                     initial={{ opacity: 0, y: 20 }}
                                     animate={{ opacity: 1, y: 0 }}
                                     exit={{ opacity: 0, y: -20 }}
@@ -232,38 +315,17 @@ function Recetas() {
                                         </div>
                                     ) : (
                                         <>
-                                            {(recetasFiltradas.length > 0 ? recetasFiltradas : recetas)
-                                                .slice((pagina - 1) * limite, pagina * limite)
-                                                .map((receta) => (
-                                                    <Link to={`/receta/${receta.id}`} key={receta.id}>
-                                                        <motion.div
-                                                            whileHover={{ scale: 1.03, boxShadow: '0px 4px 15px rgba(0, 0, 0, 0.1)' }}
-                                                            className='border-2 flex flex-col h-full justify-between cursor-pointer transition-all duration-300 ease-in-out'
-                                                        >
-                                                            <img className='w-full' src={receta.image_url} alt={receta.title} />
-                                                            <div className='text-center texto-normal font-medium mb-2' id={`receta_${receta.id}`}>
-                                                                {receta.title}
-                                                            </div>
-                                                            <div className='px-3 text-center'>{receta.description}</div>
-                                                            <div className='w-2/3 self-center justify-between flex'>
-                                                                <div className='flex flex-col items-center mb-2 w-1/2'>
-                                                                    <img className='w-15' src="/iconos/reloj.webp" alt="Reloj Icono" />
-                                                                    <div>{receta.totalTimeMinutes} m</div>
-                                                                </div>
-                                                                <div className='flex flex-col items-center w-1/2'>
-                                                                    <img className='w-15' src="/iconos/dificultad-icono.png" alt="Dificultad Icono" />
-                                                                    <div>{dificultad_receta(receta.totalTimeMinutes)}</div>
-                                                                </div>
-                                                            </div>
-                                                        </motion.div>
-                                                    </Link>
-                                                ))
-                                            }
-
+                                            <ListaRecetas
+                                                recetas={recetas}
+                                                recetasFiltradas={recetasFiltradas}
+                                                pagina={pagina}
+                                                limite={limite}
+                                                dificultad_receta={dificultad_receta}
+                                            />
                                             <div className='text-right w-full col-span-full px-2 texto-normal'>
                                                 <button disabled={pagina === 1} onClick={handlePreviousPage}>&lt;</button>
-                                                {pagina} de {totalRecetas}
-                                                <button disabled={pagina === totalRecetas} onClick={handleNextPage}>&gt;</button>
+                                                {pagina} de {totalPaginas}
+                                                <button disabled={pagina === totalPaginas} onClick={handleNextPage}>&gt;</button>
                                             </div>
                                         </>
                                     )}

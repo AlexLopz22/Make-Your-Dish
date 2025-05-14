@@ -2,17 +2,17 @@ package make.your.dish.Api.rest;
 
 
 import make.your.dish.Api.dto.IngredienteCantidadDTO;
-import make.your.dish.Api.entidades.Ingrediente;
-import make.your.dish.Api.entidades.PasosReceta;
-import make.your.dish.Api.entidades.Receta;
+import make.your.dish.Api.entidades.*;
 import make.your.dish.Api.services.IngredienteService;
 import make.your.dish.Api.services.PasoRecetaService;
 import make.your.dish.Api.services.RecetaService;
+import make.your.dish.Api.services.UsuariosService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import make.your.dish.Api.repositorio.RecetaRepository;
 import java.util.List;
@@ -23,13 +23,15 @@ import java.util.Optional;
 public class ApiController {
     private final RecetaService recetaService;
     private final IngredienteService ingredienteService;
-    private PasoRecetaService pasoRecetaService;
+    private final PasoRecetaService pasoRecetaService;
+    private final UsuariosService usuariosService;
 
     @Autowired
-    public ApiController(RecetaService recetaService, IngredienteService ingredienteService, PasoRecetaService pasoRecetaService) {
+    public ApiController(RecetaService recetaService, IngredienteService ingredienteService, PasoRecetaService pasoRecetaService, UsuariosService usuariosService) {
         this.recetaService = recetaService;
         this.ingredienteService = ingredienteService;
         this.pasoRecetaService = pasoRecetaService;
+        this.usuariosService = usuariosService;
     }
 
     @GetMapping("/recetas")
@@ -57,7 +59,7 @@ public class ApiController {
         return ingredienteService.getIngredientesByReceta(idreceta);
     }
 
-    @GetMapping("receta/pasos/{idreceta}")
+    @GetMapping("/receta/pasos/{idreceta}")
     public List<PasosReceta> obtenerPasosPorReceta(@PathVariable Integer idreceta) {
         return pasoRecetaService.getAllPasos(idreceta);
     }
