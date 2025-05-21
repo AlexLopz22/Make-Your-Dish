@@ -1,19 +1,19 @@
 package make.your.dish.Api.entidades;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 
 import java.util.List;
 
 @Entity
 @Table(name = "recipes", schema = "myd_app")
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class Receta {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id")
-    private Integer id;  // Cambié de Long a Integer, ya que el tipo en la base de datos es INT.
+    private Integer id;
 
-    @Column(name = "title")
     private String title;
 
     @Column(name = "image_url")
@@ -28,22 +28,17 @@ public class Receta {
     @Column(name = "total_time_minutes")
     private Integer totalTimeMinutes;
 
-    @Column(name = "servings")
     private Integer servings;
-
-    @Column(name = "category")
     private String category;
-
-    @Column(name = "cuisine")
     private String cuisine;
 
     @Column(name = "calories_per_serving")
     private Integer caloriesPerServing;
 
-    @Column(name = "description")
+    @Column(length = 1000)
     private String description;
 
-    @OneToMany(mappedBy = "receta", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "receta", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<IngredientesReceta> ingredientes;
 
     // Getters y setters

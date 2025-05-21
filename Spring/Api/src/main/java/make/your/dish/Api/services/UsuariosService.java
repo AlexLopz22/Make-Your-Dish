@@ -36,4 +36,25 @@ public class UsuariosService {
                 .filter(usuario -> passwordEncoder.matches(contraseñaIngresada, usuario.getContraseña()))
                 .orElse(null);
     }
+
+    public Usuario actualizarUsuario(Usuario usuarioNuevo) {
+        Usuario usuario = repository.findById(usuarioNuevo.getId())
+                .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+
+        if (usuarioNuevo.getNombre() != null) {
+            usuario.setNombre(usuarioNuevo.getNombre());
+        }
+
+        if (usuarioNuevo.getEmail() != null) {
+            usuario.setEmail(usuarioNuevo.getEmail());
+        }
+
+        if (usuarioNuevo.getContraseña() != null && !usuarioNuevo.getContraseña().isBlank()) {
+            String contraseñaEncriptada = passwordEncoder.encode(usuarioNuevo.getContraseña());
+
+            usuario.setContraseña(contraseñaEncriptada);
+        }
+
+        return repository.save(usuario);
+    }
 }

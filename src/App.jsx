@@ -8,6 +8,9 @@ import Receta from './pages/Receta';
 import { Navigate } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
 import Usuario from './pages/Usuario'
+import Foro from './pages/Foro'
+import Plan from './pages/PlanSemanal'
+import Registro from './pages/Registro';
 
 function App() {
   return (
@@ -21,6 +24,9 @@ function App() {
           <Route path='/receta' element={<Navigate to="/recetas" replace />} />
           <Route path='/receta/:recetaid' element={<Receta/>} />
           <Route path='/usuario' element={<Usuario/>} />
+          <Route path='/foro' element={<Foro/>}/>
+          <Route path='/plan' element={<Plan/>}/>
+          <Route path='/registro' element={<Registro/>}/>
         </Routes>
       </BrowserRouter>
     </AuthProvider>

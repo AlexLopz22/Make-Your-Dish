@@ -57,4 +57,27 @@ public class AuthController {
             return ResponseEntity.status(401).body("Credenciales inválidas");
         }
     }
+
+    @PutMapping("/modificar")
+    public ResponseEntity<String> actualizarUsuario(@RequestBody Usuario usuarioDetalles) {
+        try {
+            usuarioService.actualizarUsuario(usuarioDetalles);
+            return ResponseEntity.ok("Usuario actualizado exitosamente");
+
+        } catch (DataIntegrityViolationException e) {
+            String errorMessage = e.getMessage();
+
+            if (errorMessage.contains("Duplicate entry") && errorMessage.contains("usuarios.email")) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("El correo electrónico ya está registrado.");
+            }
+
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error de integridad de datos: " + errorMessage);
+
+        } catch (ConstraintViolationException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error de restricción: " + e.getMessage());
+
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error al actualizar el usuario: " + e.getMessage());
+        }
+    }
 }

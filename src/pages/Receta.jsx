@@ -3,14 +3,50 @@ import React, { useEffect, useState } from 'react';
 import Header from '../components/Header'
 import Footer from '../components/Footer'
 import { useParams } from 'react-router-dom';
-import { div } from 'framer-motion/client';
+import { useAuth } from '../context/AuthContext';
+import { useNavigate } from "react-router-dom";
 
 function Receta() {
+    const { usuario } = useAuth();
     const { recetaid } = useParams();
     const [receta, setReceta] = useState();
     const [ingredientes, setIngredientes] = useState([]);
     const [pasos, setPasos] = useState([]);
     const [showModal, setShowModal] = useState(false);
+    const navigate = useNavigate();
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+
+        const datosPlan = {
+            usuarioId: usuario.id,
+            dia: e.target.diaSemana.value,
+            recetaId: receta.id.toString()
+        };
+
+        try {
+            const respuesta = await fetch("http://localhost:8080/api/plan/asignar", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(datosPlan)
+            });
+
+            const texto = await respuesta.text();
+
+            if (respuesta.ok) {
+                navigate('/plan', { state: { mensaje: "Receta agregada correctamente." } });
+
+                setTimeout(() => alert("Receta agregada correctamente."), 100);
+            } else {
+                alert("Error: " + texto);
+            }
+        } catch (error) {
+            console.error("Error al agregar al plan:", error);
+            alert("Hubo un error al agregar al plan.");
+        }
+    };
 
     useEffect(() => {
         if (recetaid) {
@@ -86,6 +122,31 @@ function Receta() {
                                 <div>- Calorias por ración: {receta.caloriesPerServing} kcal</div>
                             </div>
                         </div>
+                    </div>
+                </div>
+                <div className='p-6 w-1/4 min-w-96'>
+                    <div className='text-3xl text-center'>Añadir al plan semanal</div>
+                    <div className='flex justify-between items-center p-3'>
+                        <form onSubmit={handleSubmit} className='flex w-full justify-between items-center gap-4'>
+                            <div className='text-2xl'>
+                                <div>Día</div>
+                                <select name="diaSemana" id="diaSemana" className='texto-normal '>
+                                    <option value="Lunes">Lunes</option>
+                                    <option value="Martes">Martes</option>
+                                    <option value="Miércoles">Miércoles</option>
+                                    <option value="Jueves">Jueves</option>
+                                    <option value="Viernes">Viernes</option>
+                                    <option value="Sábado">Sábado</option>
+                                    <option value="Domingo">Domingo</option>
+                                </select>
+                            </div>
+                            <button
+                                type="submit"
+                                className="bg-[var(--color-principal)] boton-acceder text-[var(--color-blanco)] px-3 py-1 text-center rounded-2xl"
+                            >
+                                Guardar cambios
+                            </button>
+                        </form>
                     </div>
                 </div>
                 <div className='p-6'>
