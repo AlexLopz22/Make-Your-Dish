@@ -33,7 +33,7 @@ export default function CalendarioRecetas({ recetas, usuarioId }) {
 
     const fechaLunes = lunes.toISOString().split('T')[0];
 
-    fetch(`http://localhost:8080/api/plan/${usuario.id}`)
+    fetch(`https://makeyourdish-api.onrender.com/api/plan/${usuario.id}`)
       .then(res => res.json())
       .then(data => {
         const nuevoPlan = {};
