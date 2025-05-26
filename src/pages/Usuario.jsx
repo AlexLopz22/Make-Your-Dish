@@ -96,6 +96,17 @@ function Usuario() {
                     <div className="border-[var(--color-principal)] border-2 p-5">
                         <div className="text-center text-2xl font-bold">Editar perfil</div>
                         <div>
+                            {/* Correo */}
+                            <div className="text-2xl mb-1 text-[var(--color-principal-apagado)]">Correo:</div>
+                            <input
+                                className="w-full border px-2 py-1 mb-5 rounded text-[var(--color-principal-apagado)]"
+                                type="email"
+                                name="correo"
+                                id="correo"
+                                value={formData.correo}
+                                readOnly
+                            />
+
                             {/* Nombre */}
                             <div className="text-2xl mb-1">Nombre y apellido:</div>
                             <input
@@ -104,17 +115,6 @@ function Usuario() {
                                 name="nombre"
                                 id="nombre"
                                 value={formData.nombre}
-                                onChange={handleChange}
-                            />
-
-                            {/* Correo */}
-                            <div className="text-2xl mb-1">Correo:</div>
-                            <input
-                                className="w-full border px-2 py-1 mb-5 rounded"
-                                type="email"
-                                name="correo"
-                                id="correo"
-                                value={formData.correo}
                                 onChange={handleChange}
                             />
 

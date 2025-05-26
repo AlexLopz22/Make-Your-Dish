@@ -7,6 +7,7 @@
   font-size: 16px;
   --color-principal: #8cc43f;
   --color-blanco: #fafafa;
+  --color-principal-apagado: #3e8e41;
 
   background-color: var(--color-blanco);
 

@@ -6,7 +6,7 @@ import jakarta.persistence.*;
 import java.util.List;
 
 @Entity
-@Table(name = "recipes", schema = "myd_app")
+@Table(name = "recipes", schema = "public")
 @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class Receta {
 

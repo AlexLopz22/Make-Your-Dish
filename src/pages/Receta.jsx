@@ -9,10 +9,11 @@ import { useNavigate } from "react-router-dom";
 function Receta() {
     const { usuario } = useAuth();
     const { recetaid } = useParams();
-    const [receta, setReceta] = useState();
+    const [receta, setReceta] = useState(null);
     const [ingredientes, setIngredientes] = useState([]);
     const [pasos, setPasos] = useState([]);
-    const [showModal, setShowModal] = useState(false);
+    const [cargando, setCargando] = useState(true);
+    const [showModal, setShowModal] = useState(false); // nuevo
     const navigate = useNavigate();
 
     const handleSubmit = async (e) => {
@@ -37,7 +38,6 @@ function Receta() {
 
             if (respuesta.ok) {
                 navigate('/plan', { state: { mensaje: "Receta agregada correctamente." } });
-
                 setTimeout(() => alert("Receta agregada correctamente."), 100);
             } else {
                 alert("Error: " + texto);
@@ -51,31 +51,44 @@ function Receta() {
     useEffect(() => {
         if (recetaid) {
             fetch(`http://localhost:8080/api/receta/${recetaid}`)
-                .then(response => response.json())
-                .then(data => {
-                    setReceta(data);
+                .then(response => {
+                    return response.json();
                 })
-                .catch(error => console.error('Error al cargar la receta:', error));
+                .then(data => {
+                    if (data && Object.keys(data).length > 0) {
+                        setReceta(data);
+                    } else {
+                        setReceta(null); 
+                    }
+                    setCargando(false);
+                })
+                .catch(error => {
+                    console.error('Error al cargar la receta:', error);
+                    setReceta(null);
+                    setCargando(false);
+                });
 
             fetch(`http://localhost:8080/api/receta/ingredientes/${recetaid}`)
                 .then(response => response.json())
-                .then(data => {
-                    setIngredientes(data);
-                })
+                .then(data => setIngredientes(data))
                 .catch(error => console.error('Error al cargar los ingredientes:', error));
 
             fetch(`http://localhost:8080/api/receta/pasos/${recetaid}`)
                 .then(response => response.json())
-                .then(data => {
-                    setPasos(data);
-                })
+                .then(data => setPasos(data))
                 .catch(error => console.error('Error al cargar los pasos:', error));
         }
-    }, []);
+    }, [recetaid]);
 
-    if (!receta) {
-        return <div>Cargando...</div>;
-    }
+
+    useEffect(() => {
+        if (!cargando && receta === null) {
+            navigate('/recetas', { state: { mensaje: "Receta no encontrada." } });
+            setTimeout(() => alert("Receta no encontrada."), 100);
+        }
+    }, [receta, cargando, navigate]);
+
+    if (!receta) return null;
 
     return (
         <>
@@ -153,13 +166,16 @@ function Receta() {
                     <div className='text-3xl text-center'>Pasos para hacer {receta.title.toLowerCase()}:</div>
                     <div className='p-5 grid grid-cols-2 gap-5'>
                         {pasos.map((paso) => (
-                            <div className='items-center mb-4' key={paso.id}>
-                                <div className='text-center mx-auto mb-2 w-3/4'><b>- Paso {paso.id.numPaso}:</b> {paso.descripcion}</div>
+                            <div className='items-center mb-4' key={paso.id.numPaso}>
+                                <div className='text-center mx-auto mb-2 w-3/4'>
+                                    <b>- Paso {paso.id.numPaso}:</b> {paso.descripcion}
+                                </div>
                                 <div className='flex justify-center'>
                                     <img src={paso.imagenUrl} alt="Imagen paso" className="max-w-full w-3/4 h-auto" />
                                 </div>
                             </div>
                         ))}
+
                     </div>
 
                 </div>

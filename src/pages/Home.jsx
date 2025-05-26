@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import '../App.css'
 import Header from '../components/Header';
 import Footer from '../components/Footer';
@@ -18,6 +18,14 @@ function Home() {
     const showPrevSlide = () => {
         setCurrentIndex((prevIndex) => (prevIndex - 1 + fondos.length) % fondos.length);
     };
+
+    useEffect(() => {
+        const interval = setInterval(() => {
+            setCurrentIndex((prevIndex) => (prevIndex + 1) % fondos.length);
+        }, 5000);
+
+        return () => clearInterval(interval); 
+    }, []);
 
     return (
         <>
