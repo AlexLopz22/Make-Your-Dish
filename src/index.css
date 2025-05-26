@@ -1,0 +1,169 @@
+@import "tailwindcss";
+:root {
+  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+
+  font-size: 16px;
+  --color-principal: #8cc43f;
+  --color-blanco: #fafafa;
+  --color-principal-apagado: #3e8e41;
+
+  background-color: var(--color-blanco);
+
+  color-scheme: light dark;
+  color: var(--color-principal);
+
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+
+}
+/* Tamaño de fuente */
+.texto-normal{
+  font-size: 20px;
+}
+
+/* Estilos para los enlaces del header */
+.link {
+  position: relative;
+  text-decoration: none;
+  color: inherit;
+  display: inline-block; 
+  transition: transform 0.4s ease;
+}
+.link::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 0%;
+  height: 2px;
+  background-color: var(--color-principal);
+  transition: width 0.4s ease;
+}
+.link:hover {
+  text-decoration: none; 
+  transform: scale(1.05);
+}
+.link:hover::after {
+  width: 100%; 
+}
+
+/* Estilos para el boton acceder del header */
+.boton-acceder{
+  transition: all 0.4s ease;
+}
+.boton-acceder:hover{
+  border: 1px solid var(--color-principal);
+  color: var(--color-principal);
+  background-color: var(--color-blanco);
+}
+.a{
+  display: none;
+}
+
+/*Estilos para el login*/
+.input {
+  background-color: var(--color-blanco);
+  color: black;
+  border: 2px solid #D1D5DB; 
+  border-radius: 0.375rem; 
+  padding: 0.2rem 1rem; 
+  transition: all 0.2s ease;
+}
+.input:focus {
+  outline: none;
+  border: 2px solid #3B82F6; 
+}
+.input:hover {
+  border-color: #3B82F6; 
+  box-shadow: 0 0 0 1px rgba(59, 130, 246, 0.5); 
+}
+.boton-login {
+  width: 150px;
+  justify-content: center;
+  background-color: var(--color-blanco);
+  color: var(--color-principal); 
+  border: 2px solid #D1D5DB; 
+  border-radius: 0.375rem; 
+  padding: 0.75rem 1.5rem; 
+  font-size: 1rem; 
+  font-weight: 600; 
+  cursor: pointer; 
+  transition: all 0.3s ease; 
+}
+
+.boton-login:focus {
+  outline: none; 
+  box-shadow: 0 0 0 2px rgba(76, 175, 80, 0.6); 
+}
+
+.boton-login:hover {
+  background-color: #D1D5DB;
+  border-color: #45a049; 
+}
+
+.boton-login:active {
+  background-color: #3e8e41; 
+  border-color: #3e8e41;
+  transform: translateY(1px); 
+}
+
+
+
+/*Estilos pagina de recetas*/
+#ingrediente-principal {
+  background-color: white; 
+  color: black; 
+  padding: 10px;
+  border: 2px solid #ccc;
+  border-radius: 5px;
+  font-size: 16px;
+  width: 100%;
+}
+
+#ingrediente-principal:focus {
+  border-color: #4A90E2; 
+  outline: none; 
+}
+
+#ingrediente-principal::-ms-expand {
+  display: none; 
+}
+
+#ingrediente-principal option:hover {
+  background-color: #f1f1f1; 
+  color: #333; 
+}
+
+#ingrediente-principal option:checked {
+  background-color: #4A90E2;
+  color: white; 
+}
+
+/* Estilos para el boton enviar del formulario del footer*/
+.boton-enviar-form{
+  background-color: var(--color-blanco);
+  color: var(--color-principal);
+  padding-left: 5px;
+  padding-right: 5px;
+  padding-top: 2px;
+  padding-bottom: 2px;
+  transition: all 0.4s ease;
+}
+.boton-enviar-form:hover{
+  color: var(--color-blanco);
+  background-color: var(--color-principal);
+  border: 1px solid var(--color-blanco);
+}
+
+.text-shadow-lg {
+  text-shadow: 2px 2px 2px rgba(0, 0, 0, 0.9);
+}
+
+.text-shadow-md {
+  font-weight: 500;
+  text-shadow: 1.5px 1.5px 1px rgba(0, 0, 0, 0.9);
+}
