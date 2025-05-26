@@ -63,7 +63,7 @@ function Usuario() {
         };
 
         try {
-            const respuesta = await fetch("http://localhost:8080/api/auth/modificar", {
+            const respuesta = await fetch("https://makeyourdish-api.onrender.com/api/auth/modificar", {
                 method: "PUT",
                 headers: {
                     "Content-Type": "application/json"

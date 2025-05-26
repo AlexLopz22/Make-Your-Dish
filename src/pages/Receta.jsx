@@ -26,7 +26,7 @@ function Receta() {
         };
 
         try {
-            const respuesta = await fetch("http://localhost:8080/api/plan/asignar", {
+            const respuesta = await fetch("https://makeyourdish-api.onrender.com/api/plan/asignar", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json"
@@ -50,7 +50,7 @@ function Receta() {
 
     useEffect(() => {
         if (recetaid) {
-            fetch(`http://localhost:8080/api/receta/${recetaid}`)
+            fetch(`https://makeyourdish-api.onrender.com/api/receta/${recetaid}`)
                 .then(response => {
                     return response.json();
                 })
@@ -68,12 +68,12 @@ function Receta() {
                     setCargando(false);
                 });
 
-            fetch(`http://localhost:8080/api/receta/ingredientes/${recetaid}`)
+            fetch(`https://makeyourdish-api.onrender.com/api/receta/ingredientes/${recetaid}`)
                 .then(response => response.json())
                 .then(data => setIngredientes(data))
                 .catch(error => console.error('Error al cargar los ingredientes:', error));
 
-            fetch(`http://localhost:8080/api/receta/pasos/${recetaid}`)
+            fetch(`https://makeyourdish-api.onrender.com/api/receta/pasos/${recetaid}`)
                 .then(response => response.json())
                 .then(data => setPasos(data))
                 .catch(error => console.error('Error al cargar los pasos:', error));

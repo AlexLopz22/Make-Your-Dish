@@ -27,7 +27,7 @@ export default function InformeIngredientes() {
     }
 
     useEffect(() => {
-        fetch(`http://localhost:8080/api/plan/ingredientes/${usuario.id}`)
+        fetch(`https://makeyourdish-api.onrender.com/api/plan/ingredientes/${usuario.id}`)
             .then(res => res.json())
             .then(data => setIngredientes(data))
             .catch(err => console.error('Error al cargar ingredientes:', err));

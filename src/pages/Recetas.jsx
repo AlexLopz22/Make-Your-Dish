@@ -22,7 +22,7 @@ function Recetas() {
 
     // Cargar todas las recetas iniciales
     useEffect(() => {
-        fetch("http://localhost:8080/api/recetas")
+        fetch("https://makeyourdish-api.onrender.com/api/recetas")
             .then(res => res.json())
             .then(data => {
                 setRecetas(data);
@@ -32,7 +32,7 @@ function Recetas() {
 
     // Cargar ingredientes
     useEffect(() => {
-        fetch("http://localhost:8080/api/ingredientes")
+        fetch("https://makeyourdish-api.onrender.com/api/ingredientes")
             .then(res => res.json())
             .then(data => setIngredientes(data))
             .catch(err => console.error("Error al cargar ingredientes:", err));
@@ -45,7 +45,7 @@ function Recetas() {
 
             // Filtrar por ingrediente
             if (filtros.ingrediente && filtros.ingrediente !== "-") {
-                fetch(`http://localhost:8080/api/recetas/ingrediente/${filtros.ingrediente}`)
+                fetch(`https://makeyourdish-api.onrender.com/api/recetas/ingrediente/${filtros.ingrediente}`)
                     .then(response => {
                         if (!response.ok) {
                             throw new Error('Error al obtener las recetas');
