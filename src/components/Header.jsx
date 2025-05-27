@@ -57,7 +57,7 @@ function Header() {
                     <AnimatePresence>
                         {menuAbierto && (
                             <motion.div
-                                className="absolute right-0 mt-2 w-48 bg-white border rounded shadow-lg z-50 text-base"
+                                className="absolute right-0 mt-2 w-48 bg-[var(--color-blanco)] border rounded shadow-lg z-50 text-base"
                                 initial={{ opacity: 0, scale: 0.95 }}
                                 animate={{ opacity: 1, scale: 1 }}
                                 exit={{ opacity: 0, scale: 0.95 }}

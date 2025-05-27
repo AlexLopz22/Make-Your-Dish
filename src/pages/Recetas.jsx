@@ -7,107 +7,98 @@ import { Link } from 'react-router-dom';
 import ListaRecetas from '../components/ListaRecetas';
 
 function Recetas() {
-    const [recetas, setRecetas] = useState([]);  // Todas las recetas
-    const [recetasFiltradas, setRecetasFiltradas] = useState([]);  // Resultado de filtros
+    const [recetas, setRecetas] = useState([]);
+    const [recetasFiltradas, setRecetasFiltradas] = useState([]);
     const [ingredientes, setIngredientes] = useState([]);
     const [pagina, setPagina] = useState(1);
     const [limite, setLimite] = useState(6);
     const [totalPaginas, setTotalPaginas] = useState(1);
+    const [isInitialLoading, setIsInitialLoading] = useState(true);
+    const [isFiltering, setIsFiltering] = useState(false);
     const [filtros, setFiltros] = useState({
         dificultad: [],
         tiempo: [],
         ingrediente: "-",
     });
-    const [tipoFiltro, setTipoFiltro] = useState('');  // Tipo de filtro seleccionado
+    const [tipoFiltro, setTipoFiltro] = useState('');
 
-    // Cargar todas las recetas iniciales
     useEffect(() => {
-        fetch("https://makeyourdish-api.onrender.com/api/recetas")
-            .then(res => res.json())
-            .then(data => {
-                setRecetas(data);
-            })
-            .catch(err => console.error("Error al cargar recetas:", err));
+        const fetchData = async () => {
+            setIsInitialLoading(true);
+            try {
+                const [recetasRes, ingredientesRes] = await Promise.all([
+                    fetch("https://makeyourdish-api.onrender.com/api/recetas"),
+                    fetch("https://makeyourdish-api.onrender.com/api/ingredientes"),
+                ]);
+
+                const recetasData = await recetasRes.json();
+                const ingredientesData = await ingredientesRes.json();
+
+                setRecetas(recetasData);
+                setIngredientes(ingredientesData);
+            } catch (error) {
+                console.error("Error al cargar datos:", error);
+            } finally {
+                setIsInitialLoading(false);
+            }
+        };
+
+        fetchData();
     }, []);
 
-    // Cargar ingredientes
+
     useEffect(() => {
-        fetch("https://makeyourdish-api.onrender.com/api/ingredientes")
-            .then(res => res.json())
-            .then(data => setIngredientes(data))
-            .catch(err => console.error("Error al cargar ingredientes:", err));
-    }, []);
+        const aplicarFiltros = async () => {
+            setIsFiltering(true);
+            try {
+                let filtradas = [...recetas];
 
-    // Aplicar filtros cuando cambian `recetas` o `filtros`
-    useEffect(() => {
-        const aplicarFiltros = () => {
-            let filtradas = [...recetas];
+                if (filtros.ingrediente && filtros.ingrediente !== "-") {
+                    const res = await fetch(`https://makeyourdish-api.onrender.com/api/recetas/ingrediente/${filtros.ingrediente}`);
+                    if (!res.ok) throw new Error("Error al obtener las recetas por ingrediente");
+                    filtradas = await res.json();
+                }
 
-            // Filtrar por ingrediente
-            if (filtros.ingrediente && filtros.ingrediente !== "-") {
-                fetch(`https://makeyourdish-api.onrender.com/api/recetas/ingrediente/${filtros.ingrediente}`)
-                    .then(response => {
-                        if (!response.ok) {
-                            throw new Error('Error al obtener las recetas');
-                        }
-                        return response.json(); 
-                    })
-                    .then(data => {
-                        filtradas = data; 
-                        setRecetasFiltradas(filtradas); 
-                    })
-                    .catch(error => {
-                        console.error('Hubo un problema con la solicitud fetch:', error);
+                if (filtros.tiempo.length > 0) {
+                    filtradas = filtradas.filter(receta =>
+                        filtros.tiempo.some(filtro => {
+                            const minutos = receta.totalTimeMinutes;
+                            switch (filtro) {
+                                case "menos-20": return minutos < 20;
+                                case "entre-20-30": return minutos >= 20 && minutos <= 30;
+                                case "entre-30-40": return minutos > 30 && minutos <= 40;
+                                case "mas-40": return minutos > 40;
+                                default: return true;
+                            }
+                        })
+                    );
+                }
+
+                if (filtros.dificultad.length > 0) {
+                    filtradas = filtradas.filter(receta => {
+                        const dificultad = dificultad_receta(receta.totalTimeMinutes);
+                        return filtros.dificultad.some(filtro => {
+                            switch (filtro) {
+                                case "dificultad-facil": return dificultad === "Fácil";
+                                case "dificultad-media": return dificultad === "Media";
+                                case "dificultad-dificil": return dificultad === "Difícil";
+                                default: return true;
+                            }
+                        });
                     });
-            }
+                }
 
-            // Filtrar por tiempo
-            if (filtros.tiempo.length > 0) {
-                filtradas = filtradas.filter(receta =>
-                    filtros.tiempo.some(filtro => {
-                        const minutos = receta.totalTimeMinutes;
-                        switch (filtro) {
-                            case "menos-20":
-                                return minutos < 20;
-                            case "entre-20-30":
-                                return minutos >= 20 && minutos <= 30;
-                            case "entre-30-40":
-                                return minutos > 30 && minutos <= 40;
-                            case "mas-40":
-                                return minutos > 40;
-                            default:
-                                return true;
-                        }
-                    })
-                );
+                setRecetasFiltradas(filtradas);
+                setTotalPaginas(Math.max(1, Math.ceil(filtradas.length / limite)));
+            } catch (error) {
+                console.error("Error aplicando filtros:", error);
+            } finally {
+                setIsFiltering(false);
             }
-
-            // Filtrar por dificultad
-            if (filtros.dificultad.length > 0) {
-                filtradas = filtradas.filter(receta => {
-                    const dificultad = dificultad_receta(receta.totalTimeMinutes);
-                    return filtros.dificultad.some(filtro => {
-                        switch (filtro) {
-                            case "dificultad-facil":
-                                return dificultad === "Fácil";
-                            case "dificultad-media":
-                                return dificultad === "Media";
-                            case "dificultad-dificil":
-                                return dificultad === "Difícil";
-                            default:
-                                return true;
-                        }
-                    });
-                });
-            }
-
-            // Actualizar el estado de recetas filtradas
-            setRecetasFiltradas(filtradas);
-            setTotalPaginas(Math.max(1, Math.ceil(filtradas.length / limite)));
         };
 
         aplicarFiltros();
-    }, [recetas, filtros, limite]);
+    }, [filtros, recetas]);
 
     // Cambiar filtros desde UI
     const handleFiltroChange = (e) => {
@@ -203,14 +194,14 @@ function Recetas() {
                                 <div className='texto-normal mb-2'>Filtrar por:</div>
 
                                 {/* Selector para el tipo de filtro */}
-                                <select name="tipo-filtro" onChange={handleTipoFiltroChange} value={tipoFiltro} className='w-full mb-4 bg-[var(--color-principal)]'>
+                                <select name="tipo-filtro" onChange={handleTipoFiltroChange} value={tipoFiltro} className='w-full mb-4 bg-[var(--color-principal)] border-1 p-2 border-[var(--color-blanco)]'>
                                     <option value="">Selecciona una opción</option>
                                     <option value="dificultad">Dificultad</option>
                                     <option value="tiempo">Tiempo de preparación</option>
                                     <option value="ingrediente">Ingrediente principal</option>
                                 </select>
 
-                                <hr className='my-2' />
+                                <hr className='my-1' />
 
                                 {/* Filtro por dificultad */}
                                 {tipoFiltro === 'dificultad' && (
@@ -300,37 +291,47 @@ function Recetas() {
 
                         {/* Recetas */}
                         <div className='w-3/4 pl-5'>
-                            <AnimatePresence mode="wait">
-                                <motion.div
-                                    key={recetasFiltradas.length === 0 || recetas.length === 0 ? 'no-recetas' : `pagina-${pagina}-${recetasFiltradas.length}`}
-                                    initial={{ opacity: 0, y: 20 }}
-                                    animate={{ opacity: 1, y: 0 }}
-                                    exit={{ opacity: 0, y: -20 }}
-                                    transition={{ duration: 0.4 }}
-                                    className='grid grid-cols-3 gap-2.5 h-full'
-                                >
-                                    {(recetasFiltradas.length === 0 || recetas.length === 0) ? (
-                                        <div className='col-span-full text-center flex justify-center items-center h-full bg-[#eaf5d4]'>
-                                            No hay recetas disponibles.
-                                        </div>
-                                    ) : (
-                                        <>
-                                            <ListaRecetas
-                                                recetas={recetas}
-                                                recetasFiltradas={recetasFiltradas}
-                                                pagina={pagina}
-                                                limite={limite}
-                                                dificultad_receta={dificultad_receta}
-                                            />
-                                            <div className='text-right w-full col-span-full px-2 texto-normal'>
-                                                <button disabled={pagina === 1} onClick={handlePreviousPage}>&lt;</button>
-                                                {pagina} de {totalPaginas}
-                                                <button disabled={pagina === totalPaginas} onClick={handleNextPage}>&gt;</button>
+                            {isInitialLoading ? (
+                                <div className="flex justify-center items-center h-64">
+                                    <div className="animate-spin rounded-full h-12 w-12 border-t-4 border-b-4 border-[var(--color-principal)]"></div>
+                                </div>
+                            ) : isFiltering ? (
+                                <div className="flex justify-center items-center h-64">
+                                    <div className="animate-spin rounded-full h-10 w-10 border-t-4 border-b-4 border-[var(--color-principal)]"></div>
+                                </div>
+                            ) : (
+                                <AnimatePresence mode="wait">
+                                    <motion.div
+                                        key={recetasFiltradas.length === 0 || recetas.length === 0 ? 'no-recetas' : `pagina-${pagina}-${recetasFiltradas.length}`}
+                                        initial={{ opacity: 0, y: 20 }}
+                                        animate={{ opacity: 1, y: 0 }}
+                                        exit={{ opacity: 0, y: -20 }}
+                                        transition={{ duration: 0.4 }}
+                                        className='grid grid-cols-3 gap-2.5 h-full'
+                                    >
+                                        {(recetasFiltradas.length === 0 || recetas.length === 0) ? (
+                                            <div className='col-span-full text-center flex justify-center items-center h-full bg-[#eaf5d4]'>
+                                                No hay recetas disponibles.
                                             </div>
-                                        </>
-                                    )}
-                                </motion.div>
-                            </AnimatePresence>
+                                        ) : (
+                                            <>
+                                                <ListaRecetas
+                                                    recetas={recetas}
+                                                    recetasFiltradas={recetasFiltradas}
+                                                    pagina={pagina}
+                                                    limite={limite}
+                                                    dificultad_receta={dificultad_receta}
+                                                />
+                                                <div className='text-right w-full col-span-full px-2 texto-normal'>
+                                                    <button disabled={pagina === 1} onClick={handlePreviousPage}>&lt;</button>
+                                                    {pagina} de {totalPaginas}
+                                                    <button disabled={pagina === totalPaginas} onClick={handleNextPage}>&gt;</button>
+                                                </div>
+                                            </>
+                                        )}
+                                    </motion.div>
+                                </AnimatePresence>
+                            )}
                         </div>
                     </div>
                 </div>
