@@ -43,7 +43,7 @@ function Receta() {
                 navigate('/plan', { state: { mensaje: "Receta agregada correctamente." } });
                 setTimeout(() => alert("Receta agregada correctamente."), 100);
             } else {
-                alert("Error: " + texto);
+                alert("Error: Dia de la semana ya ocupado");
             }
         } catch (error) {
             console.error("Error al agregar al plan:", error);

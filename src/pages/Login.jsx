@@ -7,6 +7,7 @@ function Login() {
   const { login } = useAuth();
   const navigate = useNavigate();
   const [mostrarConfirmarContrasena, setMostrarConfirmarContrasena] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const toggleMostrarConfirmarContrasena = () => {
     setMostrarConfirmarContrasena(prev => !prev);
@@ -15,6 +16,8 @@ function Login() {
 
   const handleLogin = async (e) => {
     e.preventDefault();
+    setIsSubmitting(true);
+
     const email = e.target.email.value;
     const contraseña = e.target.password.value;
 
@@ -42,6 +45,8 @@ function Login() {
 
     } catch (err) {
       alert("Error en login: " + (err.message || "Error desconocido"));
+    } finally{
+      setIsSubmitting(false);
     }
   };
 
@@ -92,7 +97,7 @@ function Login() {
                 )}
               </button>
               <button className="boton-login mt-5 mb-8" type="submit">
-                Acceder
+                {isSubmitting ? 'Accediendo...' : 'Acceder'}
               </button>
               <hr className="border-t-2 border-[var(--color-blanco)] w-full mb-8" />
               <div className="flex text-2xl justify-around items-center w-full">
