@@ -9,7 +9,8 @@ function Usuario() {
     const { usuario, logout } = useAuth();
     const navigate = useNavigate();
     const [mostrarConfirmarContrasena, setMostrarConfirmarContrasena] = useState(false);
-
+    const [isSubmitting, setIsSubmitting] = useState(false);
+    
     const [formData, setFormData] = useState({
         nombre: '',
         correo: '',
@@ -24,6 +25,7 @@ function Usuario() {
 
 
     useEffect(() => {
+
         if (usuario) {
             setFormData({
                 nombre: usuario.nombre || '',
@@ -49,6 +51,8 @@ function Usuario() {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+
+        setIsSubmitting(true);
 
         if (formData.cambiarContrasena && formData.nuevaContrasena !== formData.confirmarContrasena) {
             alert("Las contraseñas no coinciden.");
@@ -85,6 +89,8 @@ function Usuario() {
         } catch (error) {
             console.error("Error al actualizar usuario:", error);
             alert("Hubo un error al actualizar el perfil.");
+        } finally {
+            setIsSubmitting(false);
         }
     };
 
@@ -193,7 +199,7 @@ function Usuario() {
                                     type="submit"
                                     className="w-60 bg-[var(--color-principal)] boton-acceder text-[var(--color-blanco)] px-3 py-1 text-center rounded-2xl"
                                 >
-                                    Guardar cambios
+                                    {isSubmitting ? 'Guardando...' : 'Guardar cambios'}
                                 </button>
                             </div>
                         </div>

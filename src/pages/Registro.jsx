@@ -7,6 +7,7 @@ function Registro() {
     const { login } = useAuth();
     const navigate = useNavigate();
     const [mostrarConfirmarContrasena, setMostrarConfirmarContrasena] = useState(false);
+    const [isSubmitting, setIsSubmitting] = useState(false);
 
     const toggleMostrarConfirmarContrasena = () => {
         setMostrarConfirmarContrasena(prev => !prev);
@@ -14,6 +15,9 @@ function Registro() {
 
     const handleRegistro = async (e) => {
         e.preventDefault();
+
+        setIsSubmitting(true);
+
         const nombre = e.target.nombre.value;
         const email = e.target.email.value;
         const contraseña = e.target.password.value;
@@ -47,6 +51,8 @@ function Registro() {
 
         } catch (err) {
             alert("Error en el registro: " + (err.message || "Error desconocido"));
+        } finally{
+            setIsSubmitting(false);
         }
     };
 
@@ -119,7 +125,7 @@ function Registro() {
                                 )}
                             </button>
                             <button className="boton-login mt-5 mb-8" type="submit">
-                                Registrarse
+                                {isSubmitting ? 'Registrando...' : 'Registrarse'}
                             </button>
                         </div>
                     </form>

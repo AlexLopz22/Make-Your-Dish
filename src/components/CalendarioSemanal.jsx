@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { Link } from 'react-router-dom';
+import { useNavigate } from "react-router-dom";
 
 const dias = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo'];
 
@@ -20,6 +21,7 @@ export default function CalendarioRecetas({ recetas, usuarioId }) {
   const [plan, setPlan] = useState({});
   const [isLoadingPlan, setIsLoadingPlan] = React.useState(true);
   const [eliminando, setEliminando] = useState(false);
+  const navigate = useNavigate();
 
   const onEliminar = async (nombre) => {
     setEliminando(nombre);
@@ -37,8 +39,8 @@ export default function CalendarioRecetas({ recetas, usuarioId }) {
 
       if (respuesta.ok) {
         alert(`Receta eliminada para el día ${nombreDia}`);
-        // Opcional: Actualiza el estado local para que desaparezca la receta sin recargar
-        setPlan((prev) => ({ ...prev, [nombreDia]: null }));
+
+        window.location.reload();
       } else {
         alert(`Error al eliminar receta: ${texto}`);
       }
