@@ -312,10 +312,20 @@ function Recetas() {
                         </div>
                     )}
 
-                    <div className='flex'>
-                        {/* Filtros visibles en escritorio */}
-                        <div className="hidden lg:block lg:w-1/4 pr-4">
-                            <form>
+                    <div className='flex gap-5'>
+                        
+                        <div className='hidden lg:block lg:w-1/4 bg-[var(--color-principal)] text-[var(--color-blanco)] p-5 w-1/4'>
+                            <form action="#">
+                                <div className='texto-normal mb-2'>Filtrar por:</div>
+
+                                {/* Selector para el tipo de filtro */}
+                                <select name="tipo-filtro" onChange={handleTipoFiltroChange} value={tipoFiltro} className='w-full mb-4 bg-[var(--color-principal)] border-1 p-2 border-[var(--color-blanco)]'>
+                                    <option value="">Selecciona una opción</option>
+                                    <option value="dificultad">Dificultad</option>
+                                    <option value="tiempo">Tiempo de preparación</option>
+                                    <option value="ingrediente">Ingrediente principal</option>
+                                </select>
+
                                 <hr className='my-1' />
 
                                 {/* Filtro por dificultad */}
@@ -403,7 +413,6 @@ function Recetas() {
                                 )}
                             </form>
                         </div>
-
                         {/* Recetas */}
                         <div className='w-full lg:w-3/4 relative'>
                             {isInitialLoading ? (
