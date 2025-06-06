@@ -26,7 +26,7 @@ function Plan() {
         <>
             <Header />
             <div className='w-full min-h-[500px] flex justify-center p-5'>
-                <div className='w-3/4 p-5 '>
+                <div className='w-5/6 md:w-3/4 p-5 '>
                     <div className='text-2xl'>
                         - Plan Semanal
                     </div>
