@@ -58,12 +58,12 @@ function Registro() {
 
     return (
         <div className="min-h-[500px] w-full h-screen flex items-center justify-center">
-            <div className="w-2/3 bg-[var(--color-principal)] text-[var(--color-blanco)] p-5 flex flex-col items-center gap-5">
+            <div className="w-5/6 md:w-2/3 bg-[var(--color-principal)] text-[var(--color-blanco)] p-5 flex flex-col items-center gap-5">
                 <Link to="/"><img className="h-32" src="/logos/logo-blanco.webp" alt="Logo blanco MYD" /></Link> 
                 <div className="w-3/4">
                     <form onSubmit={handleRegistro}>
                         <div className="flex flex-col items-center">
-                            <div className="flex flex-col text-2xl mb-3 w-full">
+                            <div className="flex flex-col text-[20px] md:text-2xl mb-3 w-full">
                                 Nombre:
                                 <input
                                     className="input"
@@ -74,7 +74,7 @@ function Registro() {
                                     required
                                 />
                             </div>
-                            <div className="flex flex-col text-2xl mb-3 w-full">
+                            <div className="flex flex-col text-[20px] md:text-2xl mb-3 w-full">
                                 Usuario:
                                 <input
                                     className="input"
@@ -85,7 +85,7 @@ function Registro() {
                                     required
                                 />
                             </div>
-                            <div className="flex flex-col text-2xl mb-3 w-full">
+                            <div className="flex flex-col text-[20px] md:text-2xl mb-3 w-full">
                                 Contraseña:
                                 <input
                                     className="input"
@@ -96,7 +96,7 @@ function Registro() {
                                     required
                                 />
                             </div>
-                            <div className="flex flex-col text-2xl mb-3 w-full">
+                            <div className="flex flex-col text-[20px] md:text-2xl mb-3 w-full">
                                 Confirmar contraseña:
                                 <input
                                     className="input"

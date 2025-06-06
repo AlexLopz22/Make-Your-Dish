@@ -55,7 +55,7 @@ export default function InformeIngredientes() {
                 {ingredientes.length === 0 ? (
                     <p className="text-[var(--color-principal)]">No hay ingredientes planificados para esta semana.</p>
                 ) : (
-                    <ul className=" pl-5 space-y-2 grid grid-cols-2">
+                    <ul className=" pl-5 space-y-2 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3">
                         {ingredientes.map((ing, i) => (
                             <li key={i}>- {ing[1]} {ing[2]} de {ing[0].toLowerCase()}</li>
                         ))}

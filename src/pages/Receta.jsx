@@ -119,10 +119,10 @@ function Receta() {
                     </div>
                 ) : (
                     <>
-                        <div className='w-4/5 flex justify-between relative'>
+                        <div className='w-4/5 flex justify-between relative flex-col md:flex-row'>
                             {/* Imagen pequeña que abre modal */}
                             <div
-                                className="w-1/4 h-160 overflow-hidden cursor-pointer"
+                                className="w-full h-80 overflow-hidden cursor-pointer md:w-1/4 md:h-160"
                                 onClick={() => setShowModal(true)}
                             >
                                 <img
@@ -147,10 +147,10 @@ function Receta() {
                             )}
 
                             {/* Detalles de la receta */}
-                            <div className='w-3/4 p-8 flex flex-col justify-around'>
+                            <div className='w-full p-3 md:p-8 flex flex-col justify-around md:w-3/4'>
                                 <div className='text-5xl text-center'>{receta.title}</div>
-                                <div className='mt-5 flex justify-between gap-3'>
-                                    <div className='w-1/2 text-center'>
+                                <div className='mt-5 flex flex-col justify-between gap-5 md:gap-3 md:flex-row'>
+                                    <div className='w-full text-center md:w-1/2'>
                                         <div className='text-3xl underline'>Ingredientes:</div>
                                         {ingredientes.map((ingrediente) => (
                                             ingrediente.cantidad === "al gusto" ? (
@@ -160,7 +160,7 @@ function Receta() {
                                             )
                                         ))}
                                     </div>
-                                    <div className='w-1/2 text-center'>
+                                    <div className='w-full text-center md:w-1/2'>
                                         <div className='text-3xl underline'>Información:</div>
                                         <div>- Tiempo de preparación: {receta.prepTimeMinutes} min</div>
                                         <div>- Tiempo de cocinado: {receta.cookTimeMinutes} min</div>
@@ -175,7 +175,7 @@ function Receta() {
                         </div>
 
                         {/* Formulario Añadir al plan semanal */}
-                        <div className='p-6 w-1/4 min-w-96'>
+                        <div className='p-3 md:p-6 w-1/4 min-w-96'>
                             <div className='text-3xl text-center'>Añadir al plan semanal</div>
                             <div className='flex justify-between items-center p-3'>
                                 <form onSubmit={handleSubmit} className='flex w-full justify-between items-center gap-4'>
@@ -202,9 +202,9 @@ function Receta() {
                         </div>
 
                         {/* Pasos para hacer la receta */}
-                        <div className='p-6 w-full'>
+                        <div className='p-3 md:p-6 w-full'>
                             <div className='text-3xl text-center'>Pasos para hacer {receta.title.toLowerCase()}:</div>
-                            <div className='p-5 grid grid-cols-2 gap-5'>
+                            <div className='p-2 grid grid-cols-1 gap-5 md:p-5 md:grid-cols-2'>
                                 {pasos.map((paso) => (
                                     <div className='items-center mb-4' key={paso.id.numPaso}>
                                         <div className='text-center mx-auto mb-2 w-3/4'>
