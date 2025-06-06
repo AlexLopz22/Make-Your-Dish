@@ -20,6 +20,9 @@
   -moz-osx-font-smoothing: grayscale;
 
 }
+body{
+  height: 100%;
+}
 /* Tamaño de fuente */
 .texto-normal{
   font-size: 20px;

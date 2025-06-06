@@ -112,7 +112,7 @@ function Receta() {
     return (
         <>
             <Header />
-            <div className='w-full flex items-center p-10 flex-col'>
+            <div className='w-full min-h-[500px] flex items-center p-10 flex-col'>
                 {cargando ? (
                     <div className="flex justify-center items-center h-64">
                         <div className="animate-spin rounded-full h-10 w-10 border-t-4 border-b-4 border-[var(--color-principal)]"></div>

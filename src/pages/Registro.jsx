@@ -57,7 +57,7 @@ function Registro() {
     };
 
     return (
-        <div className="w-full h-screen flex items-center justify-center">
+        <div className="min-h-[500px] w-full h-screen flex items-center justify-center">
             <div className="w-2/3 bg-[var(--color-principal)] text-[var(--color-blanco)] p-5 flex flex-col items-center gap-5">
                 <Link to="/"><img className="h-32" src="/logos/logo-blanco.webp" alt="Logo blanco MYD" /></Link> 
                 <div className="w-3/4">

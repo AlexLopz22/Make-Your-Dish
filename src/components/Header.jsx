@@ -123,7 +123,7 @@ function Header() {
                                 </div>
                             </>
                         ) : (
-                            <Link className="py-2 w-full text-center border-b border-gray-300" to="/login" onClick={toggleMenuMovil}>Acceder</Link>
+                            <Link className="py-2 w-full text-center border-b border-[var(--color-principal)]" to="/login" onClick={toggleMenuMovil}>Acceder</Link>
                         )}
                     </motion.div>
                 )}

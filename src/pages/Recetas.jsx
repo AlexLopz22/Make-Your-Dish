@@ -184,7 +184,7 @@ function Recetas() {
     return (
         <>
             <Header />
-            <div className='w-full p-5 flex flex-col justify-center'>
+            <div className='w-full min-h-[500px] p-5 flex flex-col justify-center'>
                 <div className='w-4/5 mx-auto p-3'>
                     <div className='text-3xl mb-5'>Recetas</div>
                     <div className='flex'>
