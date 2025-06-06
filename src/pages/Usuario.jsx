@@ -97,15 +97,15 @@ function Usuario() {
     return (
         <>
             <Header />
-            <form onSubmit={handleSubmit} className="w-full flex justify-center p-10">
-                <div className="w-2/3 p-5">
-                    <div className="border-[var(--color-principal)] border-2 p-5">
-                        <div className="text-center text-2xl font-bold">Editar perfil</div>
+            <form onSubmit={handleSubmit} className="w-full min-h-[500px] flex items-center justify-center p-4 sm:p-6 lg:p-10">
+                <div className="w-full max-w-4xl lg:w-2/3 p-3 sm:p-5">
+                    <div className="border-[var(--color-principal)] border-2 p-4 sm:p-5">
+                        <div className="text-center text-xl sm:text-2xl font-bold mb-4 sm:mb-6">Editar perfil</div>
                         <div>
                             {/* Correo */}
-                            <div className="text-2xl mb-1 text-[var(--color-principal-apagado)]">Correo:</div>
+                            <div className="text-lg sm:text-2xl mb-1 text-[var(--color-principal-apagado)]">Correo:</div>
                             <input
-                                className="w-full border px-2 py-1 mb-5 rounded text-[var(--color-principal-apagado)]"
+                                className="w-full border px-2 py-1 mb-4 sm:mb-5 rounded text-[var(--color-principal-apagado)] text-sm sm:text-base"
                                 type="email"
                                 name="correo"
                                 id="correo"
@@ -114,9 +114,9 @@ function Usuario() {
                             />
 
                             {/* Nombre */}
-                            <div className="text-2xl mb-1">Nombre y apellido:</div>
+                            <div className="text-lg sm:text-2xl mb-1">Nombre y apellido:</div>
                             <input
-                                className="w-full border px-2 py-1 mb-5 rounded"
+                                className="w-full border px-2 py-1 mb-4 sm:mb-5 rounded text-sm sm:text-base"
                                 type="text"
                                 name="nombre"
                                 id="nombre"
@@ -134,7 +134,7 @@ function Usuario() {
                                     onChange={handleChange}
                                     className="appearance-none w-4 h-4 border border-[var(--color-principal)] bg-white checked:bg-[var(--color-principal)] rounded-sm cursor-pointer"
                                 />
-                                <label htmlFor="cambiarContrasena" className="cursor-pointer">
+                                <label htmlFor="cambiarContrasena" className="cursor-pointer text-sm sm:text-base">
                                     ¿Quieres cambiar la contraseña?
                                 </label>
                             </div>
@@ -144,7 +144,7 @@ function Usuario() {
                                 <>
                                     {/* Nueva contraseña */}
                                     <div className="mt-4 relative">
-                                        <label htmlFor="nuevaContrasena" className="text-2xl mb-1 block">
+                                        <label htmlFor="nuevaContrasena" className="text-lg sm:text-2xl mb-1 block">
                                             Nueva contraseña
                                         </label>
                                         <input
@@ -154,13 +154,13 @@ function Usuario() {
                                             value={formData.nuevaContrasena}
                                             onChange={handleChange}
                                             required
-                                            className="w-full border px-2 py-1 rounded mb-5 pr-12" // espacio para botón
+                                            className="w-full border px-2 py-1 rounded mb-4 sm:mb-5 pr-12 text-sm sm:text-base"
                                         />
                                     </div>
 
                                     {/* Confirmar contraseña */}
                                     <div className="mt-4 relative">
-                                        <label htmlFor="confirmarContrasena" className="text-2xl mb-1 block">
+                                        <label htmlFor="confirmarContrasena" className="text-lg sm:text-2xl mb-1 block">
                                             Confirmar contraseña
                                         </label>
                                         <input
@@ -170,22 +170,23 @@ function Usuario() {
                                             value={formData.confirmarContrasena}
                                             onChange={handleChange}
                                             required
-                                            className="w-full border px-2 py-1 rounded mb-5 pr-12" // espacio para botón
+                                            className="w-full border px-2 py-1 rounded mb-4 sm:mb-5 pr-12 text-sm sm:text-base"
                                         />
                                         <button
                                             type="button"
                                             onClick={toggleMostrarConfirmarContrasena}
                                             tabIndex={-1}
+                                            className="mt-2"
                                         >
                                             {mostrarConfirmarContrasena ? (
-                                                <div className="flex items-center h-10 space-x-2 justify-center">
-                                                    <img src="/iconos/ojo-abierto.webp" alt="Ojo abierto" className="w-6" />
-                                                    <span>Ocultar contraseña</span>
+                                                <div className="flex items-center h-8 sm:h-10 space-x-2 justify-center">
+                                                    <img src="/iconos/ojo-abierto.webp" alt="Ojo abierto" className="w-5 sm:w-6" />
+                                                    <span className="text-sm sm:text-base">Ocultar contraseña</span>
                                                 </div>
                                             ) : (
-                                                <div className="flex items-center h-10 space-x-2 justify-center">
-                                                    <img src="/iconos/ojo-cerrado.webp" alt="Ojo cerrado" className="w-6" />
-                                                    <span>Mostrar contraseña</span>
+                                                <div className="flex items-center h-8 sm:h-10 space-x-2 justify-center">
+                                                    <img src="/iconos/ojo-cerrado.webp" alt="Ojo cerrado" className="w-5 sm:w-6" />
+                                                    <span className="text-sm sm:text-base">Mostrar contraseña</span>
                                                 </div>
                                             )}
                                         </button>
@@ -194,10 +195,10 @@ function Usuario() {
                             )}
 
                             {/* Botón guardar */}
-                            <div className="w-full flex justify-center">
+                            <div className="w-full flex justify-center mt-4 sm:mt-6">
                                 <button
                                     type="submit"
-                                    className="w-60 bg-[var(--color-principal)] boton-acceder text-[var(--color-blanco)] px-3 py-1 text-center rounded-2xl"
+                                    className="w-full max-w-60 bg-[var(--color-principal)] boton-acceder text-[var(--color-blanco)] px-3 py-2 sm:py-1 text-center rounded-2xl text-sm sm:text-base"
                                 >
                                     {isSubmitting ? 'Guardando...' : 'Guardar cambios'}
                                 </button>
